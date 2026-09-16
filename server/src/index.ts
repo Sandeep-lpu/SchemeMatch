@@ -11,6 +11,8 @@ import { DprGeneratorService } from './services/dprGenerator';
 import { DocumentService } from './services/documentService';
 import { SaathiChatService } from './services/chatService';
 import { GroqAIService } from './services/groqService';
+import { GeoSpatialPartnerRouterService, PartnerRoutingRequest } from './services/geoPartnerRouter';
+import { TtsService } from './services/ttsService';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +26,8 @@ const dprService = new DprGeneratorService();
 const documentService = new DocumentService();
 const chatService = new SaathiChatService(schemes);
 const groqService = new GroqAIService();
+const partnerRouterService = new GeoSpatialPartnerRouterService();
+const ttsService = new TtsService();
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -83,10 +87,32 @@ app.get('/api/personas', (req: Request, res: Response) => {
 // AI Scheme Matching Engine
 app.post('/api/match', (req: Request, res: Response) => {
   try {
-    const profile: UserProfile = req.body;
-    if (!profile || !profile.category || !profile.sector) {
-      return res.status(400).json({ error: 'Incomplete user profile. Category and sector are required.' });
+    const rawProfile: UserProfile = req.body;
+    if (!rawProfile) {
+      return res.status(400).json({ error: 'User profile is required.' });
     }
+
+    // Gracefully infer sector if not explicitly set
+    let inferredSector = rawProfile.sector;
+    if (!inferredSector) {
+      const tradeLower = (rawProfile.tradeType || '').toLowerCase();
+      if (tradeLower.includes('tailor') || tradeLower.includes('darzi') || tradeLower.includes('stitching') || tradeLower.includes('cloth') || tradeLower.includes('garment')) {
+        inferredSector = 'Textiles';
+      } else if (tradeLower.includes('weaver') || tradeLower.includes('potter') || tradeLower.includes('carpenter') || tradeLower.includes('artisan')) {
+        inferredSector = 'ArtisanHandicraft';
+      } else if (tradeLower.includes('street') || tradeLower.includes('vendor') || tradeLower.includes('thela') || tradeLower.includes('cart')) {
+        inferredSector = 'StreetVending';
+      } else {
+        inferredSector = 'Services';
+      }
+    }
+
+    const profile: UserProfile = {
+      ...rawProfile,
+      sector: inferredSector,
+      category: rawProfile.category || ('' as any),
+      locationType: rawProfile.locationType || ('' as any)
+    };
 
     const matches = matchingEngine.matchSchemes(profile);
     const topMatches = matches.filter((m) => m.isEligible);
@@ -136,6 +162,37 @@ app.post('/api/documents/analyze', (req: Request, res: Response) => {
     res.json(report);
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error analyzing documents' });
+  }
+});
+
+// Geo-Spatial Partner Locator & Router Endpoint
+app.post('/api/partners/route', (req: Request, res: Response) => {
+  try {
+    const routingReq: PartnerRoutingRequest = req.body;
+    const result = partnerRouterService.routePartners(routingReq);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Error processing partner routing' });
+  }
+});
+
+// Get all channel partners
+app.get('/api/partners', (req: Request, res: Response) => {
+  try {
+    const { district, type } = req.query;
+    let partners = partnerRouterService.getAllPartners();
+    if (district && typeof district === 'string') {
+      partners = partners.filter(p => p.district.toLowerCase() === district.toLowerCase());
+    }
+    if (type && typeof type === 'string') {
+      partners = partners.filter(p => p.type.toLowerCase() === type.toLowerCase());
+    }
+    res.json({
+      count: partners.length,
+      partners
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Error fetching partners' });
   }
 });
 
@@ -221,6 +278,22 @@ app.post('/api/ai/dpr-narrative', async (req: Request, res: Response) => {
     res.json(narrative);
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error generating DPR narrative' });
+  }
+});
+
+// Text-To-Speech (Sarvam AI with ElevenLabs fallback)
+app.post('/api/tts', async (req: Request, res: Response) => {
+  try {
+    const { text, language, speaker } = req.body;
+    if (!text || typeof text !== 'string') {
+      return res.status(400).json({ error: 'Text is required for TTS speech synthesis.' });
+    }
+
+    const result = await ttsService.generateSpeech({ text, language, speaker });
+    res.json(result);
+  } catch (err: any) {
+    console.error('TTS endpoint error:', err);
+    res.status(500).json({ error: err.message || 'Error generating TTS speech' });
   }
 });
 

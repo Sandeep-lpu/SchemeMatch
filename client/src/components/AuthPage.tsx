@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import authSideBannerImg from '../assets/auth-side-banner.jpg';
 import logoImg from '../assets/logo.png';
 import { 
   ArrowLeft, 
@@ -17,7 +16,11 @@ import {
   Globe,
   Sun,
   Moon,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp,
+  Award,
+  Zap,
+  Check
 } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
@@ -134,14 +137,123 @@ export const AuthPage: React.FC = () => {
       {/* Main Rounded 2-Column Card Container */}
       <div className="new-auth-card-frame">
         {/* =========================================================
-            LEFT COLUMN: Side Banner Image matching new theme asset
+            LEFT COLUMN: Code-Crafted Affirmative Intelligence Hub
+            (No cheap raster flyers — 100% custom UI widgets & telemetry)
             ========================================================= */}
-        <div className="new-auth-side-column">
-          <img 
-            src={authSideBannerImg} 
-            alt="Your Goals Our Support — SchemeMatch AI Scheme Matching" 
-            className="new-auth-side-image"
-          />
+        <div className="new-auth-intel-hub">
+          {/* Top Pill & Headline */}
+          <div className="new-auth-hub-header">
+            <div className="new-auth-hub-badge">
+              <span className="new-auth-hub-pulse" />
+              <span>Affirmative Credit Intelligence</span>
+              <span className="new-auth-hub-dot">•</span>
+              <span className="text-muted">Live 2.4</span>
+            </div>
+
+            <h2 className="new-auth-hub-title">
+              Empowering Bharat’s Entrepreneurs with <span className="text-gradient-brand">AI-Driven Subsidies</span>
+            </h2>
+            <p className="new-auth-hub-desc">
+              SchemeMatch automates affirmative scheme discovery, calculates exact capital subsidies, and compiles bank-ready DPRs for institutional financing.
+            </p>
+          </div>
+
+          {/* Interactive Live Match Telemetry Widget */}
+          <div className="new-auth-match-card">
+            <div className="new-auth-match-card-header">
+              <div className="new-auth-match-card-title-group">
+                <span className="new-auth-match-icon-wrap">
+                  <Sparkles size={16} className="text-amber" />
+                </span>
+                <div>
+                  <div className="new-auth-match-title">PMEGP Capital Subsidy</div>
+                  <div className="new-auth-match-cat">Special Category • Micro Enterprise</div>
+                </div>
+              </div>
+              <span className="new-auth-match-pill">98% Match</span>
+            </div>
+
+            <div className="new-auth-match-stats-row">
+              <div className="new-auth-stat-item">
+                <div className="stat-label">Eligible Subsidy</div>
+                <div className="stat-val highlight">₹12,50,000</div>
+              </div>
+              <div className="new-auth-stat-item">
+                <div className="stat-label">Own Contribution</div>
+                <div className="stat-val">5% Only</div>
+              </div>
+              <div className="new-auth-stat-item">
+                <div className="stat-label">Nodal Channel</div>
+                <div className="stat-val">KVIC / DIC</div>
+              </div>
+            </div>
+
+            {/* DPR Readiness Indicator */}
+            <div className="new-auth-dpr-progress-wrap">
+              <div className="new-auth-dpr-progress-labels">
+                <span className="dpr-txt">
+                  <CheckCircle2 size={13} className="text-emerald" />
+                  Bankable DPR Readiness
+                </span>
+                <span className="dpr-pct">100% Prepared</span>
+              </div>
+              <div className="new-auth-dpr-bar">
+                <div className="new-auth-dpr-fill" style={{ width: '100%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Platform Performance Metrics (3-Column Frosted Grid) */}
+          <div className="new-auth-metrics-grid">
+            <div className="new-auth-metric-tile">
+              <div className="metric-tile-val">₹180 Cr+</div>
+              <div className="metric-tile-lbl">Subsidies Unlocked</div>
+            </div>
+            <div className="new-auth-metric-tile">
+              <div className="metric-tile-val">500+</div>
+              <div className="metric-tile-lbl">Govt Schemes</div>
+            </div>
+            <div className="new-auth-metric-tile">
+              <div className="metric-tile-val">15 Min</div>
+              <div className="metric-tile-lbl">Instant AI DPR</div>
+            </div>
+          </div>
+
+          {/* Real Beneficiary Success Quote */}
+          <div className="new-auth-testimonial-tile">
+            <p className="new-auth-testimonial-quote">
+              “SchemeMatch identified a ₹9.5 Lakh capital grant under Stand-Up India for my textile enterprise in 10 minutes.”
+            </p>
+            <div className="new-auth-testimonial-author">
+              <div className="new-auth-author-avatar">SE</div>
+              <div className="new-auth-author-meta">
+                <div className="author-name">Verified Beneficiary</div>
+                <div className="author-desc">Textile Enterprise • ₹9.5L Sanctioned</div>
+              </div>
+              <span className="new-auth-verified-badge">
+                <Check size={12} />
+                Verified
+              </span>
+            </div>
+          </div>
+
+          {/* Trust & Security Footnote Row */}
+          <div className="new-auth-hub-security">
+            <div className="security-item">
+              <ShieldCheck size={14} className="text-indigo" />
+              <span>256-bit AES Encryption</span>
+            </div>
+            <span className="security-dot">•</span>
+            <div className="security-item">
+              <Award size={14} className="text-amber" />
+              <span>DigiLocker Verified</span>
+            </div>
+            <span className="security-dot">•</span>
+            <div className="security-item">
+              <Zap size={14} className="text-emerald" />
+              <span>RBI Bank Compliant</span>
+            </div>
+          </div>
         </div>
 
         {/* =========================================================
@@ -332,10 +444,10 @@ export const AuthPage: React.FC = () => {
               <button
                 type="button"
                 className="new-auth-demo-pill"
-                onClick={() => loginDemo('Sunita Devi (Demo)', 'sunita.devi@enterprise.in')}
+                onClick={() => loginDemo('Entrepreneur', 'entrepreneur@schemematch.gov.in')}
               >
                 <Sparkles size={13} className="text-amber" />
-                <span>⚡ Instant Demo Access (Sunita Devi • 96% Match)</span>
+                <span>⚡ Instant Demo Access (Verified Profile • 96% Match)</span>
               </button>
             </div>
           </div>

@@ -184,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginDemo = (name: string = 'Sunita Devi', email: string = 'sunita.devi@enterprise.in') => {
+  const loginDemo = (name: string = 'Entrepreneur', email: string = 'entrepreneur@schemematch.gov.in') => {
     const demoUser: AppUser = {
       id: 'demo-' + Date.now(),
       email,

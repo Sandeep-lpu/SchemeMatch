@@ -155,10 +155,6 @@ export const GapAnalyzer: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span className="badge badge-indigo" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Sparkles size={12} />
-                Feature 5 of 10
-              </span>
               <span className="badge badge-emerald">Explainable AI Diagnostics</span>
             </div>
             <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>

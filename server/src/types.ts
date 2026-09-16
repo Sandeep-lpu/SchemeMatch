@@ -1,6 +1,6 @@
-export type SocialCategory = 'SC' | 'ST' | 'OBC' | 'General' | 'Minority' | 'SafaiKaramchari' | 'DNT';
-export type Gender = 'Male' | 'Female' | 'Transgender' | 'Other';
-export type LocationType = 'Rural' | 'Urban' | 'Semi-Urban';
+export type SocialCategory = 'SC' | 'ST' | 'OBC' | 'General' | 'Minority' | 'SafaiKaramchari' | 'DNT' | '';
+export type Gender = 'Male' | 'Female' | 'Transgender' | 'Other' | '';
+export type LocationType = 'Rural' | 'Urban' | 'Semi-Urban' | '';
 export type EnterpriseStage = 'Ideation' | 'NewEnterprise' | 'ExistingExpansion';
 export type SectorType = 
   | 'Manufacturing' 
@@ -10,7 +10,8 @@ export type SectorType =
   | 'AgroAllied' 
   | 'StreetVending' 
   | 'Sanitation' 
-  | 'Textiles';
+  | 'Textiles'
+  | '';
 
 export type EducationLevel = 
   | 'Below8th' 

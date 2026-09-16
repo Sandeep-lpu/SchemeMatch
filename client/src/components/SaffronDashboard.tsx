@@ -11,7 +11,6 @@ import {
   ChevronRight, TrendingUp, IndianRupee, Award, Filter
 } from 'lucide-react';
 import logoImg from '../assets/logo.png';
-import indiaMapUrl from '../assets/india-map-watermark.svg';
 
 // Feature components
 import { EligibilityWizard } from './EligibilityWizard';
@@ -60,7 +59,7 @@ export const SaffronDashboard: React.FC = () => {
   const {
     activeTab, setActiveTab,
     matchResults, otherSchemes, totalPotentialSubsidy,
-    comparedSchemes, profile, personas, selectedPersonaId, selectPersona,
+    comparedSchemes, profile,
     setSelectedSchemeModal
   } = useProfile();
   const { t, theme, toggleTheme, language, setLanguage } = useLanguage();
@@ -70,33 +69,129 @@ export const SaffronDashboard: React.FC = () => {
   const [avatarError, setAvatarError] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
 
-  const firstNameGreeting = user?.fullName?.split(' ')[0] || profile.fullName?.split(' ')[0] || 'Entrepreneur';
+  const firstNameGreeting = user?.fullName?.split(' ')[0] || 'Entrepreneur';
+
+  // Translated nav labels
+  const navLabels: Record<string, Record<string, string>> = {
+    en: {
+      overview: 'Overview', dashboard: 'Dashboard', aiTools: 'AI Tools',
+      profile: 'AI Profile Extraction', matcher: 'Scheme Recommender',
+      gap: 'Eligibility Gap Analyzer', whatif: 'What-If Simulator',
+      calculator: 'Financial Calculator', partners: 'Channel Partner Router',
+      documents: 'Document Readiness', appraisal: 'Appraisal & Delivery',
+      dpr: 'Bank-Ready DPR', comparison: 'Scheme Comparison', roadmap: 'Application Roadmap',
+      toolsFeatures: 'Tools & Features', launch: 'Launch', viewAll: 'View All',
+      prioritySchemes: 'Top Priority Schemes', schemesUnlocked: 'Priority Schemes Unlocked',
+      welcomeBack: 'Welcome back', schemesMatched: 'government schemes',
+      upTo: 'up to', subsidies: 'in capital subsidies, concessional credit, and collateral-free loans.',
+      viewMatched: 'View Matched Schemes', diagnoseGaps: 'Diagnose Eligibility Gaps',
+      subsAvail: 'Available Subsidy', docReady: 'Doc Ready', schemesFound: 'Schemes Found',
+      activeProfile: 'Active Profile', signOut: 'Sign Out'
+    },
+    hi: {
+      overview: 'अवलोकन', dashboard: 'डैशबोर्ड', aiTools: 'AI उपकरण',
+      profile: 'AI प्रोफ़ाइल निष्कर्षण', matcher: 'योजना अनुशंसक',
+      gap: 'पात्रता अंतर विश्लेषक', whatif: 'क्या-अगर सिम्युलेटर',
+      calculator: 'वित्तीय कैलकुलेटर', partners: 'चैनल पार्टनर राउटर',
+      documents: 'दस्तावेज़ तत्परता', appraisal: 'मूल्यांकन एवं वितरण',
+      dpr: 'बैंक-रेडी DPR', comparison: 'योजना तुलना', roadmap: 'आवेदन रोडमैप',
+      toolsFeatures: 'उपकरण और सुविधाएं', launch: 'खोलें', viewAll: 'सभी देखें',
+      prioritySchemes: 'शीर्ष प्राथमिकता योजनाएं', schemesUnlocked: 'प्राथमिकता योजनाएं अनलॉक',
+      welcomeBack: 'वापसी पर स्वागत है', schemesMatched: 'सरकारी योजनाओं',
+      upTo: 'तक', subsidies: 'पूंजी सब्सिडी, रियायती ऋण, और जमानत-मुक्त ऋण में।',
+      viewMatched: 'मिलान योजनाएं देखें', diagnoseGaps: 'पात्रता अंतर जांचें',
+      subsAvail: 'उपलब्ध सब्सिडी', docReady: 'दस्तावेज़ तैयार', schemesFound: 'योजनाएं मिलीं',
+      activeProfile: 'सक्रिय प्रोफ़ाइल', signOut: 'साइन आउट'
+    },
+    te: {
+      overview: 'అవలోకనం', dashboard: 'డ్యాష్‌బోర్డ్', aiTools: 'AI సాధనాలు',
+      profile: 'AI ప్రొఫైల్ వెలికితీత', matcher: 'పథక సిఫార్సుదారు',
+      gap: 'అర్హత లోటు విశ్లేషకం', whatif: 'ఏమైతే-అయితే సిమ్యులేటర్',
+      calculator: 'ఆర్థిక కాలిక్యులేటర్', partners: 'ఛానల్ పార్ట్‌నర్ రూటర్',
+      documents: 'పత్ర సంసిద్ధత', appraisal: 'మూల్యాంకనం & వితరణ',
+      dpr: 'బ్యాంక్-రెడీ DPR', comparison: 'పథక పోలిక', roadmap: 'దరఖాస్తు రోడ్‌మ్యాప్',
+      toolsFeatures: 'సాధనాలు & ఫీచర్లు', launch: 'ప్రారంభించు', viewAll: 'అన్నీ చూడు',
+      prioritySchemes: 'అగ్ర ప్రాధాన్య పథకాలు', schemesUnlocked: 'ప్రాధాన్య పథకాలు అన్‌లాక్',
+      welcomeBack: 'తిరిగి స్వాగతం', schemesMatched: 'ప్రభుత్వ పథకాలు',
+      upTo: 'వరకు', subsidies: 'మూలధన సబ్సిడీలు, రాయితీ క్రెడిట్, మరియు జామీన్-రహిత రుణాలలో.',
+      viewMatched: 'సరిపోయిన పథకాలు చూడండి', diagnoseGaps: 'అర్హత లోపాలను గుర్తించండి',
+      subsAvail: 'అందుబాటులో సబ్సిడీ', docReady: 'డాక్ సిద్ధం', schemesFound: 'పథకాలు కనుగొనబడ్డాయి',
+      activeProfile: 'యాక్టివ్ ప్రొఫైల్', signOut: 'సైన్ అవుట్'
+    },
+    pa: {
+      overview: 'ਸੰਖੇਪ', dashboard: 'ਡੈਸ਼ਬੋਰਡ', aiTools: 'AI ਸੰਦ',
+      profile: 'AI ਪ੍ਰੋਫਾਈਲ ਐਕਸਟ੍ਰੈਕਸ਼ਨ', matcher: 'ਸਕੀਮ ਸਿਫ਼ਾਰਿਸ਼ਕਰਤਾ',
+      gap: 'ਯੋਗਤਾ ਘਾਟ ਵਿਸ਼ਲੇਸ਼ਕ', whatif: 'ਕੀ-ਜੇ ਸਿਮੂਲੇਟਰ',
+      calculator: 'ਵਿੱਤੀ ਕੈਲਕੁਲੇਟਰ', partners: 'ਚੈਨਲ ਪਾਰਟਨਰ ਰਾਊਟਰ',
+      documents: 'ਦਸਤਾਵੇਜ਼ ਤਿਆਰੀ', appraisal: 'ਮੁਲਾਂਕਣ ਅਤੇ ਡਿਲੀਵਰੀ',
+      dpr: 'ਬੈਂਕ-ਰੈਡੀ DPR', comparison: 'ਸਕੀਮ ਤੁਲਨਾ', roadmap: 'ਅਰਜ਼ੀ ਰੋਡਮੈਪ',
+      toolsFeatures: 'ਸੰਦ ਅਤੇ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ', launch: 'ਖੋਲੋ', viewAll: 'ਸਾਰੇ ਦੇਖੋ',
+      prioritySchemes: 'ਪ੍ਰਮੁੱਖ ਸਕੀਮਾਂ', schemesUnlocked: 'ਪ੍ਰਾਥਮਿਕਤਾ ਸਕੀਮਾਂ ਅਨਲੌਕ',
+      welcomeBack: 'ਵਾਪਸੀ \'ਤੇ ਜੀ ਆਇਆਂ ਨੂੰ', schemesMatched: 'ਸਰਕਾਰੀ ਸਕੀਮਾਂ',
+      upTo: 'ਤੱਕ', subsidies: 'ਪੂੰਜੀ ਸਬਸਿਡੀ, ਰਿਆਇਤੀ ਕ੍ਰੈਡਿਟ, ਅਤੇ ਜ਼ਮਾਨਤ-ਮੁਕਤ ਕਰਜ਼ਿਆਂ ਵਿੱਚ.',
+      viewMatched: 'ਮੇਲ ਖਾਂਦੀਆਂ ਸਕੀਮਾਂ ਦੇਖੋ', diagnoseGaps: 'ਯੋਗਤਾ ਘਾਟ ਜਾਂਚੋ',
+      subsAvail: 'ਉਪਲਬਧ ਸਬਸਿਡੀ', docReady: 'ਦਸਤਾਵੇਜ਼ ਤਿਆਰ', schemesFound: 'ਸਕੀਮਾਂ ਮਿਲੀਆਂ',
+      activeProfile: 'ਸਰਗਰਮ ਪ੍ਰੋਫਾਈਲ', signOut: 'ਸਾਈਨ ਆਊਟ'
+    },
+    mr: {
+      overview: 'विहंगावलोकन', dashboard: 'डॅशबोर्ड', aiTools: 'AI साधने',
+      profile: 'AI प्रोफाइल निष्कर्षण', matcher: 'योजना शिफारसकर्ता',
+      gap: 'पात्रता तफावत विश्लेषक', whatif: 'काय-जर सिम्युलेटर',
+      calculator: 'आर्थिक कॅल्क्युलेटर', partners: 'चॅनेल पार्टनर राउटर',
+      documents: 'दस्तावेज सज्जता', appraisal: 'मूल्यांकन आणि वितरण',
+      dpr: 'बँक-रेडी DPR', comparison: 'योजना तुलना', roadmap: 'अर्ज रोडमॅप',
+      toolsFeatures: 'साधने आणि वैशिष्ट्ये', launch: 'उघडा', viewAll: 'सर्व पहा',
+      prioritySchemes: 'अग्रक्रम योजना', schemesUnlocked: 'प्राधान्य योजना अनलॉक',
+      welcomeBack: 'पुन्हा स्वागत', schemesMatched: 'सरकारी योजना',
+      upTo: 'पर्यंत', subsidies: 'भांडवल अनुदान, सवलतीचे कर्ज, आणि तारणमुक्त कर्जामध्ये.',
+      viewMatched: 'जुळणाऱ्या योजना पहा', diagnoseGaps: 'पात्रता तफावत तपासा',
+      subsAvail: 'उपलब्ध अनुदान', docReady: 'दस्तावेज तयार', schemesFound: 'योजना सापडल्या',
+      activeProfile: 'सक्रिय प्रोफाइल', signOut: 'साइन आउट'
+    },
+    bn: {
+      overview: 'সংক্ষিপ্ত বিবরণ', dashboard: 'ড্যাশবোর্ড', aiTools: 'AI সরঞ্জাম',
+      profile: 'AI প্রোফাইল নিষ্কাশন', matcher: 'প্রকল্প সুপারিশকারী',
+      gap: 'যোগ্যতা ফাঁক বিশ্লেষক', whatif: 'কী-যদি সিমুলেটর',
+      calculator: 'আর্থিক ক্যালকুলেটর', partners: 'চ্যানেল পার্টনার রাউটার',
+      documents: 'নথি প্রস্তুতি', appraisal: 'মূল্যায়ন ও বিতরণ',
+      dpr: 'ব্যাংক-রেডি DPR', comparison: 'প্রকল্প তুলনা', roadmap: 'আবেদন রোডম্যাপ',
+      toolsFeatures: 'সরঞ্জাম ও বৈশিষ্ট্য', launch: 'খুলুন', viewAll: 'সব দেখুন',
+      prioritySchemes: 'শীর্ষ অগ্রাধিকার প্রকল্প', schemesUnlocked: 'অগ্রাধিকার প্রকল্প আনলক',
+      welcomeBack: 'পুনরায় স্বাগতম', schemesMatched: 'সরকারি প্রকল্প',
+      upTo: 'পর্যন্ত', subsidies: 'মূলধন ভর্তুকি, রেয়াতি ক্রেডিট, এবং জামিনমুক্ত ঋণে.',
+      viewMatched: 'মিলিত প্রকল্প দেখুন', diagnoseGaps: 'যোগ্যতা ঘাটতি নির্ণয় করুন',
+      subsAvail: 'উপলভ্য ভর্তুকি', docReady: 'নথি প্রস্তুত', schemesFound: 'প্রকল্প পাওয়া গেছে',
+      activeProfile: 'সক্রিয় প্রোফাইল', signOut: 'সাইন আউট'
+    }
+  };
+
+  const nl = navLabels[language] || navLabels.en;
 
   const navGroups = [
     {
-      group: 'Overview',
+      group: nl.overview,
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null }
+        { id: 'dashboard', label: nl.dashboard, icon: LayoutDashboard, badge: null }
       ]
     },
     {
-      group: 'AI Intelligence',
+      group: nl.aiTools,
       items: [
-        { id: 'profile', label: 'AI Profile Extraction', icon: Cpu, badge: 'AI' },
-        { id: 'matcher', label: 'Scheme Recommender', icon: Target, badge: `${matchResults.length}` },
-        { id: 'gap', label: 'Eligibility Gap Analyzer', icon: SearchCheck, badge: null },
-        { id: 'whatif', label: 'What-If Simulator', icon: Sliders, badge: 'Live' },
-        { id: 'calculator', label: 'Financial Calculator', icon: Calculator, badge: null },
-        { id: 'partners', label: 'Channel Partner Router', icon: Building2, badge: null },
-        { id: 'documents', label: 'Document Readiness', icon: FileCheck2, badge: null },
+        { id: 'profile', label: nl.profile, icon: Cpu, badge: null },
+        { id: 'matcher', label: nl.matcher, icon: Target, badge: `${matchResults.length}` },
+        { id: 'gap', label: nl.gap, icon: SearchCheck, badge: null },
+        { id: 'whatif', label: nl.whatif, icon: Sliders, badge: null },
+        { id: 'calculator', label: nl.calculator, icon: Calculator, badge: null },
+        { id: 'partners', label: nl.partners, icon: Building2, badge: null },
+        { id: 'documents', label: nl.documents, icon: FileCheck2, badge: null },
       ]
     },
     {
-      group: 'Appraisal & Delivery',
+      group: nl.appraisal,
       items: [
-        { id: 'dpr', label: 'Bank-Ready DPR', icon: FileText, badge: 'SIDBI' },
-        { id: 'comparison', label: 'Scheme Comparison', icon: Scale, badge: comparedSchemes.length > 0 ? `${comparedSchemes.length}` : null },
-        { id: 'roadmap', label: 'Application Roadmap', icon: Compass, badge: null },
+        { id: 'dpr', label: nl.dpr, icon: FileText, badge: null },
+        { id: 'comparison', label: nl.comparison, icon: Scale, badge: comparedSchemes.length > 0 ? `${comparedSchemes.length}` : null },
+        { id: 'roadmap', label: nl.roadmap, icon: Compass, badge: null },
       ]
     }
   ];
@@ -120,43 +215,12 @@ export const SaffronDashboard: React.FC = () => {
           </button>
           <div className="si-brand-area" onClick={() => setCurrentView('landing')} title="Return to Landing">
             <img src={logoImg} alt="SchemeMatch" className="si-brand-logo" />
-            <AshokaChakra size={24} />
             <span className="si-brand-name">SchemeMatch</span>
-            <span className="si-brand-pill">Workspace</span>
           </div>
         </div>
 
-        {/* Center: top nav links */}
-        <nav className="si-top-nav-links">
-          {['Dashboard', 'Schemes', 'Patrostics', 'Documents', 'About'].map(label => (
-            <button
-              key={label}
-              className={`si-top-nav-link ${label === 'Dashboard' ? 'active' : ''}`}
-              onClick={() => {
-                if (label === 'Schemes') setActiveTab('matcher');
-                else if (label === 'Documents') setActiveTab('documents');
-                else if (label === 'Dashboard') setActiveTab('dashboard');
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
-
         {/* Right: controls + user */}
         <div className="si-top-right">
-          {/* Persona switcher */}
-          <select
-            className="si-persona-select"
-            value={selectedPersonaId}
-            onChange={e => selectPersona(e.target.value)}
-            title="Switch persona"
-          >
-            {personas.map(p => (
-              <option key={p.id} value={p.id}>{p.avatarEmoji} {p.fullName}</option>
-            ))}
-          </select>
-
           {/* Language */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Globe size={14} style={{ color: 'var(--text-muted)' }} />
@@ -196,14 +260,14 @@ export const SaffronDashboard: React.FC = () => {
             </div>
             <div className="si-user-info">
               <div className="si-user-name">{user?.fullName || 'Entrepreneur'}</div>
-              <div className="si-user-sub">{profile.category} · {profile.state}</div>
+              <div className="si-user-sub">{user?.email || ''}</div>
             </div>
           </div>
 
           {/* Sign out */}
-          <button className="si-signout-btn" onClick={logout} title="Sign Out">
+          <button className="si-signout-btn" onClick={logout} title={nl.signOut}>
             <LogOut size={15} />
-            <span className="ws-signout-label">Sign Out</span>
+            <span className="ws-signout-label">{nl.signOut}</span>
           </button>
         </div>
       </header>
@@ -246,10 +310,10 @@ export const SaffronDashboard: React.FC = () => {
               <span className="tc-saffron" /><span className="tc-white" /><span className="tc-green" />
             </div>
             <div className="si-profile-snapshot">
-              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '3px' }}>Active Profile</div>
-              <span className="si-profile-snapshot-name">{profile.fullName}</span>
+              <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '3px' }}>{nl.activeProfile}</div>
+              <span className="si-profile-snapshot-name">{user?.fullName || 'Entrepreneur'}</span>
               <span className="si-profile-snapshot-sub">
-                {profile.category} · {profile.tradeType || profile.sector} · {profile.district || profile.state}
+                {user?.email || `${profile.category || ''} · ${profile.tradeType || profile.sector || ''}`}
               </span>
             </div>
           </div>
@@ -264,29 +328,20 @@ export const SaffronDashboard: React.FC = () => {
 
               {/* Hero Banner */}
               <div className="si-hero-banner">
-                <img src={indiaMapUrl} alt="" className="si-hero-watermark" aria-hidden="true" />
-                <div className="si-hero-badge-row">
-                  <span className="si-hero-live-badge">
-                    <span className="si-hero-live-dot" />
-                    Live AI Engines
-                  </span>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Groq Llama-3.3 Active</span>
-                </div>
                 <h1 className="si-hero-title">
-                  <span>{matchResults.length} Priority Schemes</span> Unlocked
+                  <span>{matchResults.length} {nl.schemesUnlocked}</span>
                 </h1>
                 <p className="si-hero-subtitle">
-                  Welcome back, <strong>{firstNameGreeting}</strong>! Your profile is matched with{' '}
-                  <strong>{matchResults.length} government schemes</strong> offering up to{' '}
-                  <strong>₹{(totalPotentialSubsidy / 100000).toFixed(1)} Lakhs</strong> in capital subsidies,
-                  concessional credit, and collateral-free loans.
+                  {nl.welcomeBack}, <strong>{firstNameGreeting}</strong>! {language === 'hi' ? 'आपकी प्रोफ़ाइल' : 'Your profile is matched with'}{' '}
+                  <strong>{matchResults.length} {nl.schemesMatched}</strong> {language === 'hi' ? 'से मिलान किया गया है जो' : 'offering'} {nl.upTo}{' '}
+                  <strong>₹{(totalPotentialSubsidy / 100000).toFixed(1)} Lakhs</strong> {nl.subsidies}
                 </p>
                 <div className="si-hero-cta-row">
                   <button className="si-hero-cta-primary" onClick={() => setActiveTab('matcher')}>
-                    <Target size={16} /> View Matched Schemes <ArrowRight size={14} />
+                    <Target size={16} /> {nl.viewMatched} <ArrowRight size={14} />
                   </button>
                   <button className="si-hero-cta-secondary" onClick={() => setActiveTab('gap')}>
-                    <SearchCheck size={16} /> Diagnose Eligibility Gaps
+                    <SearchCheck size={16} /> {nl.diagnoseGaps}
                   </button>
                 </div>
               </div>
@@ -295,27 +350,27 @@ export const SaffronDashboard: React.FC = () => {
               <div className="si-kpi-bar">
                 <div className="si-kpi-pill">
                   <span className="si-kpi-pill-icon"><IndianRupee size={14} /></span>
-                  ₹{(totalPotentialSubsidy / 100000).toFixed(1)}L Available Subsidy
+                  ₹{(totalPotentialSubsidy / 100000).toFixed(1)}L {nl.subsAvail}
                 </div>
                 <div className="si-kpi-pill indigo">
                   <span className="si-kpi-pill-icon"><Award size={14} /></span>
-                  {matchResults[0]?.scheme.name?.split(' ').slice(0, 2).join(' ') || 'PMEGP'} Matched
+                  {matchResults[0]?.scheme.name?.split(' ').slice(0, 2).join(' ') || 'PMEGP'}
                 </div>
                 <div className="si-kpi-pill green">
                   <span className="si-kpi-pill-icon"><CheckCircle2 size={14} /></span>
-                  85% Doc Ready
+                  85% {nl.docReady}
                 </div>
                 <div className="si-kpi-pill indigo">
                   <span className="si-kpi-pill-icon"><TrendingUp size={14} /></span>
-                  {matchResults.length} Schemes Found
+                  {matchResults.length} {nl.schemesFound}
                 </div>
               </div>
 
               {/* Horizontal Scheme Cards Scroller */}
               <div className="si-section-header">
-                <span className="si-section-title">🏛️ Top Priority Schemes for {profile.fullName}</span>
+                <span className="si-section-title">🏛️ {nl.prioritySchemes}</span>
                 <button className="si-view-all-btn" onClick={() => setActiveTab('matcher')}>
-                  View All ({matchResults.length}) <ArrowRight size={13} />
+                  {nl.viewAll} ({matchResults.length}) <ArrowRight size={13} />
                 </button>
               </div>
               <div className="si-scheme-scroller">
@@ -336,19 +391,18 @@ export const SaffronDashboard: React.FC = () => {
                         <span className="si-scheme-card-name">{m.scheme.name}</span>
                         <span className="si-scheme-match-badge">{m.matchScore}%</span>
                       </div>
-                      <div className="si-scheme-card-ministry">{m.scheme.ministry}</div>
                       <div className="si-scheme-subsidy-chip">
-                        <IndianRupee size={11} /> {m.scheme.subsidyHighlight}
+                        <IndianRupee size={11} /> {m.estimatedSubsidyAmount > 0 ? `₹${(m.estimatedSubsidyAmount / 100000).toFixed(1)}L` : m.scheme.categoryTag}
                       </div>
                       <div className="si-scheme-progress-bar">
                         <div className="si-scheme-progress-fill" style={{ width: `${m.matchScore}%` }} />
                       </div>
                       <div className="si-scheme-card-footer">
                         <button className="si-scheme-apply-btn" onClick={e => { e.stopPropagation(); setActiveTab('dpr'); }}>
-                          Generate DPR
+                          {language === 'hi' ? 'DPR बनाएं' : 'Generate DPR'}
                         </button>
                         <button className="si-scheme-compare-btn" onClick={e => { e.stopPropagation(); setActiveTab('comparison'); }}>
-                          Compare
+                          {language === 'hi' ? 'तुलना करें' : 'Compare'}
                         </button>
                       </div>
                     </div>
@@ -358,19 +412,19 @@ export const SaffronDashboard: React.FC = () => {
 
               {/* Module Grid */}
               <div className="si-section-header">
-                <span className="si-section-title">⚙️ 10 Core AI Intelligence Modules</span>
+                <span className="si-section-title">⚙️ {nl.toolsFeatures}</span>
               </div>
               <div className="si-module-grid">
                 {[
-                  { id: 'profile',     icon: Cpu,          color: 'indigo', label: '1. AI Profile Extraction',    desc: 'Natural-language profile builder with NLP demographic extraction.' },
-                  { id: 'matcher',     icon: Target,        color: '',       label: '2. Smart Scheme Recommender', desc: `${matchResults.length} matched schemes with explainable affirmative scores.` },
-                  { id: 'gap',         icon: SearchCheck,   color: 'indigo', label: '5. Eligibility Gap Analyzer', desc: 'Pinpoints missing criteria with 1-click remediation guides.' },
-                  { id: 'whatif',      icon: Sliders,       color: '',       label: '6. What-If Simulator',        desc: 'Tweak loan amounts, location, and sector for live eligibility.' },
-                  { id: 'calculator',  icon: Calculator,    color: 'green',  label: '7. Financial Calculator',     desc: 'Scheme-aware EMI, subsidy deduction, and DSCR calculations.' },
-                  { id: 'partners',    icon: Building2,     color: 'indigo', label: '8. Channel Partner Router',   desc: 'Locate authorized SCAs, PSBs, and RRBs in your district.' },
-                  { id: 'documents',   icon: FileCheck2,    color: 'green',  label: '9. Document Readiness',       desc: 'OCR-based checklist scan with 85% Bank Ready scoring.' },
-                  { id: 'dpr',         icon: FileText,      color: '',       label: 'Bank-Ready DPR Generator',    desc: 'SIDBI-compliant 3-year projections and capital outlay modeling.' },
-                  { id: 'comparison',  icon: Scale,         color: 'indigo', label: 'Scheme Comparison Matrix',    desc: 'Side-by-side comparison of loan ceilings, interest, and tenure.' },
+                  { id: 'profile',     icon: Cpu,          color: 'indigo', label: nl.profile,    desc: language === 'hi' ? 'NLP द्वारा प्रोफ़ाइल निर्माण' : 'Natural-language profile builder with NLP extraction.' },
+                  { id: 'matcher',     icon: Target,        color: '',       label: nl.matcher, desc: language === 'hi' ? `${matchResults.length} योजनाएं मिलान स्कोर के साथ` : `${matchResults.length} matched schemes with explainable scores.` },
+                  { id: 'gap',         icon: SearchCheck,   color: 'indigo', label: nl.gap, desc: language === 'hi' ? 'अनुपूर्ति मार्गदर्शन' : 'Pinpoints missing criteria with remediation guides.' },
+                  { id: 'whatif',      icon: Sliders,       color: '',       label: nl.whatif,        desc: language === 'hi' ? 'ऋण, क्षेत्र, स्थान बदलकर देखें' : 'Tweak loan, location, and sector for live eligibility.' },
+                  { id: 'calculator',  icon: Calculator,    color: 'green',  label: nl.calculator,     desc: language === 'hi' ? 'EMI, सब्सिडी और DSCR गणना' : 'Scheme-aware EMI, subsidy deduction, DSCR.' },
+                  { id: 'partners',    icon: Building2,     color: 'indigo', label: nl.partners,   desc: language === 'hi' ? 'अधिकृत बैंक और एजेंसी खोजें' : 'Locate authorized SCAs, PSBs, and RRBs.' },
+                  { id: 'documents',   icon: FileCheck2,    color: 'green',  label: nl.documents,       desc: language === 'hi' ? 'OCR आधारित दस्तावेज़ जांच' : 'OCR-based checklist with readiness scoring.' },
+                  { id: 'dpr',         icon: FileText,      color: '',       label: nl.dpr,    desc: language === 'hi' ? 'SIDBI स्वरूप 3 वर्ष अनुमान' : 'SIDBI-compliant 3-year projections.' },
+                  { id: 'comparison',  icon: Scale,         color: 'indigo', label: nl.comparison,    desc: language === 'hi' ? 'ऋण सीमा, ब्याज और अवधि तुलना' : 'Side-by-side comparison of loan terms.' },
                 ].map(m => {
                   const Icon = m.icon;
                   return (
@@ -379,7 +433,7 @@ export const SaffronDashboard: React.FC = () => {
                       <div className="si-module-tile-title">{m.label}</div>
                       <div className="si-module-tile-desc">{m.desc}</div>
                       <div className="si-module-tile-footer">
-                        <span>Launch</span><ArrowRight size={12} />
+                        <span>{nl.launch}</span><ArrowRight size={12} />
                       </div>
                     </div>
                   );
@@ -392,9 +446,8 @@ export const SaffronDashboard: React.FC = () => {
           {activeTab === 'profile' && (
             <div className="si-tab-panel">
               <div className="si-tab-panel-header">
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--si-nav-active)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Module 1 of 10</span>
-                <div className="si-tab-panel-title">AI Profile Extraction & Demographic Alignment</div>
-                <div className="si-tab-panel-sub">Enter natural-language profile info. Our AI extracts socio-economic indicators, location type, and trade parameters.</div>
+                <div className="si-tab-panel-title">{nl.profile}</div>
+                <div className="si-tab-panel-sub">{language === 'hi' ? 'प्राकृतिक भाषा में प्रोफ़ाइल जानकारी दर्ज करें।' : 'Enter natural-language profile info. AI extracts socio-economic indicators.'}</div>
               </div>
               <EligibilityWizard />
             </div>
@@ -406,15 +459,19 @@ export const SaffronDashboard: React.FC = () => {
               <div className="si-tab-panel-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 8px', borderRadius: '99px', background: 'var(--si-nav-active-bg)', color: 'var(--si-nav-active)', border: '1px solid var(--si-kpi-border)' }}>Module 2 of 10</span>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 8px', borderRadius: '99px', background: 'rgba(5,150,105,0.1)', color: 'var(--si-success)', border: '1px solid rgba(5,150,105,0.25)' }}>Affirmative Engine Active</span>
-                    </div>
-                    <div className="si-tab-panel-title">Smart Scheme Recommender</div>
+                    <div className="si-tab-panel-title">{nl.matcher}</div>
                     <div className="si-tab-panel-sub">
-                      Found <strong>{matchResults.length} schemes</strong> with up to{' '}
-                      <strong style={{ color: 'var(--si-success)' }}>₹{(totalPotentialSubsidy / 100000).toFixed(1)}L</strong> in grants.
+                      {language === 'hi' 
+                        ? <>{matchResults.length} योजनाएं मिलीं, <strong style={{ color: 'var(--si-success)' }}>₹{(totalPotentialSubsidy / 100000).toFixed(1)}L</strong> तक अनुदान के साथ</>
+                        : <>Found <strong>{matchResults.length} schemes</strong> with up to{' '}
+                          <strong style={{ color: 'var(--si-success)' }}>₹{(totalPotentialSubsidy / 100000).toFixed(1)}L</strong> in grants.</>
+                      }
                     </div>
+                    {!profile.category && (
+                      <div style={{ marginTop: '6px', fontSize: '0.75rem', color: '#D97706', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span>💡 {language === 'hi' ? 'सुझाव: अपनी श्रेणी (SC/ST/OBC) चुनें ताकि लक्षित सब्सिडी 35% तक अनलॉक हो।' : 'Tip: Select your category (SC/ST/OBC) in Profile to unlock targeted subsidies up to 35%!'}</span>
+                      </div>
+                    )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Filter size={14} style={{ color: 'var(--text-muted)' }} />
@@ -423,14 +480,14 @@ export const SaffronDashboard: React.FC = () => {
                       onChange={e => setFilterCategory(e.target.value)}
                       style={{ padding: '7px 12px', fontSize: '0.84rem', borderRadius: '8px', border: '1.5px solid var(--si-card-border)', background: 'var(--si-card-bg)', color: 'var(--si-indigo)' }}
                     >
-                      <option value="all">All Schemes ({matchResults.length})</option>
-                      <option value="Credit Subsidy">Credit Subsidy</option>
-                      <option value="Term Loan">Term Loans</option>
-                      <option value="Grant">Direct Grants</option>
-                      <option value="Micro-Credit">Micro-Credit</option>
-                      <option value="Women">Women Entrepreneurs</option>
-                      <option value="SC">SC / ST</option>
-                      <option value="OBC">OBC Entrepreneurs</option>
+                      <option value="all">{language === 'hi' ? 'सभी योजनाएं' : 'All Schemes'} ({matchResults.length})</option>
+                      <option value="Credit Subsidy">{language === 'hi' ? 'ऋण सब्सिडी' : 'Credit Subsidy'}</option>
+                      <option value="Term Loan">{language === 'hi' ? 'सावधि ऋण' : 'Term Loans'}</option>
+                      <option value="Grant">{language === 'hi' ? 'प्रत्यक्ष अनुदान' : 'Direct Grants'}</option>
+                      <option value="Micro-Credit">{language === 'hi' ? 'सूक्ष्म ऋण' : 'Micro-Credit'}</option>
+                      <option value="Women">{language === 'hi' ? 'महिला उद्यमी' : 'Women Entrepreneurs'}</option>
+                      <option value="SC">{language === 'hi' ? 'SC / ST' : 'SC / ST'}</option>
+                      <option value="OBC">{language === 'hi' ? 'OBC उद्यमी' : 'OBC Entrepreneurs'}</option>
                     </select>
                   </div>
                 </div>
@@ -441,10 +498,10 @@ export const SaffronDashboard: React.FC = () => {
               {otherSchemes.length > 0 && (
                 <div style={{ marginTop: '36px', paddingTop: '24px', borderTop: '1.5px dashed var(--si-card-border)' }}>
                   <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--si-indigo)', marginBottom: '6px' }}>
-                    Conditional Schemes ({otherSchemes.length})
+                    {language === 'hi' ? `सशर्त योजनाएं (${otherSchemes.length})` : `Conditional Schemes (${otherSchemes.length})`}
                   </div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                    These need minor documentation updates or specific criteria to be met.
+                    {language === 'hi' ? 'इनमें कुछ दस्तावेज़ अद्यतन या विशेष मानदंड पूर्ति आवश्यक है।' : 'These need minor documentation updates or specific criteria to be met.'}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     {otherSchemes.slice(0, 3).map(m => <SchemeCard key={m.scheme.id} matchResult={m} />)}

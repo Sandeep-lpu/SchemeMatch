@@ -29,22 +29,34 @@ export class SchemeMatchingEngine {
 
     // 1. HARD DEMOGRAPHIC CRITERIA
     // Category check
-    const isSpecialCategory = ['SC', 'ST', 'OBC', 'SafaiKaramchari', 'DNT'].includes(profile.category);
-    const isCategoryAllowed = scheme.eligibility.allowedCategories.includes(profile.category);
+    const hasCategory = Boolean(profile.category);
+    const isSpecialCategory = hasCategory && ['SC', 'ST', 'OBC', 'SafaiKaramchari', 'DNT'].includes(profile.category);
+    
+    // Check if category is allowed, or if category is not yet specified whether the scheme is open/universal
+    const isUniversalScheme = scheme.eligibility.allowedCategories.includes('General') || scheme.eligibility.allowedCategories.length >= 4;
+    const isCategoryAllowed = !hasCategory ? isUniversalScheme : scheme.eligibility.allowedCategories.includes(profile.category);
 
     if (!isCategoryAllowed) {
       isEligible = false;
-      conditionsToFulfill.push(`Scheme is exclusively for ${scheme.eligibility.allowedCategories.join(', ')} categories.`);
+      if (!hasCategory) {
+        conditionsToFulfill.push(`Scheme is reserved for ${scheme.eligibility.allowedCategories.join(', ')}. Specify your caste category to verify eligibility.`);
+      } else {
+        conditionsToFulfill.push(`Scheme is exclusively for ${scheme.eligibility.allowedCategories.join(', ')} categories.`);
+      }
     } else {
       score += 25;
-      if (scheme.targetGroups.includes(profile.category)) {
+      if (hasCategory && scheme.targetGroups.includes(profile.category)) {
         score += 10;
         reasonsWhyMatched.push(`Prioritized beneficiary: Target demographic matches your ${profile.category} category.`);
+      } else if (!hasCategory) {
+        reasonsWhyMatched.push('Open National Scheme: Available to micro-entrepreneurs across social categories.');
+        conditionsToFulfill.push('Caste category not specified in query. Select SC/ST/OBC in Profile to unlock up to 35% MoSJE special subsidies.');
       }
     }
 
     // Gender check
-    const isGenderAllowed = scheme.eligibility.allowedGenders.includes(profile.gender);
+    const hasGender = Boolean(profile.gender);
+    const isGenderAllowed = !hasGender || scheme.eligibility.allowedGenders.includes(profile.gender);
     if (!isGenderAllowed) {
       isEligible = false;
       conditionsToFulfill.push(`Scheme is dedicated exclusively to ${scheme.eligibility.allowedGenders.join('/')} applicants.`);
@@ -82,7 +94,7 @@ export class SchemeMatchingEngine {
     }
 
     // Age bounds
-    if (profile.age < scheme.eligibility.minAge || profile.age > scheme.eligibility.maxAge) {
+    if (profile.age && (profile.age < scheme.eligibility.minAge || profile.age > scheme.eligibility.maxAge)) {
       isEligible = false;
       conditionsToFulfill.push(`Applicant age must be between ${scheme.eligibility.minAge} and ${scheme.eligibility.maxAge} years (Current age: ${profile.age}).`);
     } else {
@@ -90,7 +102,7 @@ export class SchemeMatchingEngine {
     }
 
     // Income ceiling check (MoSJE schemes e.g. NSFDC / NBCFDC / VISVAS <= ₹3 Lakh)
-    if (scheme.eligibility.incomeCeilingAnnual && scheme.eligibility.incomeCeilingAnnual > 0) {
+    if (scheme.eligibility.incomeCeilingAnnual && scheme.eligibility.incomeCeilingAnnual > 0 && profile.annualFamilyIncome > 0) {
       if (profile.annualFamilyIncome > scheme.eligibility.incomeCeilingAnnual) {
         isEligible = false;
         conditionsToFulfill.push(
@@ -105,36 +117,54 @@ export class SchemeMatchingEngine {
     }
 
     // Sector & Trade Check
-    const isSectorAllowed = scheme.eligibility.allowedSectors.includes(profile.sector);
+    const tradeLower = (profile.tradeType || '').toLowerCase();
+    const isTailor = tradeLower.includes('tailor') || tradeLower.includes('darzi') || tradeLower.includes('stitching') || tradeLower.includes('garment');
+
+    const isSectorAllowed = !profile.sector || 
+      scheme.eligibility.allowedSectors.includes(profile.sector) || 
+      (isTailor && (scheme.eligibility.allowedSectors.includes('Textiles') || scheme.eligibility.allowedSectors.includes('Services') || scheme.eligibility.allowedSectors.includes('ArtisanHandicraft')));
+
     if (!isSectorAllowed) {
       score -= 15;
       conditionsToFulfill.push(`Scheme focuses on ${scheme.eligibility.allowedSectors.join(', ')}. Current sector is ${profile.sector}.`);
     } else {
       score += 15;
-      reasonsWhyMatched.push(`Sector fit: Project sector (${profile.sector}) is fully eligible.`);
+      if (profile.sector) {
+        reasonsWhyMatched.push(`Sector fit: Project sector (${profile.sector}) is fully eligible.`);
+      }
     }
 
-    // Artisan / Traditional Trades check
+    // Artisan / Traditional Trades check (PM Vishwakarma covers 18 traditional trades including Darzi/Tailor!)
     if (scheme.eligibility.artisanTradesOnly) {
-      if (profile.sector !== 'ArtisanHandicraft' && profile.sector !== 'Textiles') {
+      if (isTailor || profile.sector === 'ArtisanHandicraft' || profile.sector === 'Textiles') {
+        score += 20;
+        if (isTailor) {
+          reasonsWhyMatched.push('Recognized PM Vishwakarma Trade: Darzi / Tailoring is officially recognized with ₹15,000 modern toolkit grant and 5% credit.');
+        } else {
+          reasonsWhyMatched.push('Artisanal craft verified: Includes ₹15,000 toolkit voucher and 5% interest subvention.');
+        }
+      } else {
         isEligible = false;
         conditionsToFulfill.push('Applicable strictly to one of the 18 recognized traditional artisan / craft trades.');
-      } else {
-        score += 15;
-        reasonsWhyMatched.push('Artisanal craft verified: Includes ₹15,000 toolkit voucher and 5% interest subvention.');
       }
     }
 
     // Location Check (Rural vs Urban)
-    if (!scheme.eligibility.allowedLocations.includes(profile.locationType)) {
+    const hasLocation = Boolean(profile.locationType);
+    if (hasLocation && !scheme.eligibility.allowedLocations.includes(profile.locationType)) {
       isEligible = false;
       conditionsToFulfill.push(`Limited to ${scheme.eligibility.allowedLocations.join(', ')} areas.`);
     } else {
       score += 5;
+      if (!hasLocation) {
+        conditionsToFulfill.push('Location type not specified: Defaults to urban/semi-urban rates. Specifying Rural can boost PMEGP subsidy to 35%.');
+      }
     }
 
     // 2. FINANCIAL LOAN SIZE FIT
-    const requiredLoan = profile.requiredLoanAmount || profile.totalProjectCost * 0.9;
+    const effectiveProjectCost = profile.totalProjectCost || (profile.requiredLoanAmount ? Math.round(profile.requiredLoanAmount * 1.15) : 100000);
+    const requiredLoan = profile.requiredLoanAmount || Math.round(effectiveProjectCost * 0.9);
+
     if (requiredLoan >= scheme.minLoanAmount && requiredLoan <= scheme.maxLoanAmount) {
       score += 15;
       reasonsWhyMatched.push(`Capital scale match: Required amount of ₹${requiredLoan.toLocaleString('en-IN')} fits comfortably within scheme limit (₹${scheme.minLoanAmount.toLocaleString('en-IN')} - ₹${scheme.maxLoanAmount.toLocaleString('en-IN')}).`);
@@ -150,13 +180,14 @@ export class SchemeMatchingEngine {
     const requiredMarginPct = isSpecialCategory || profile.gender === 'Female'
       ? scheme.promoterContributionMinPercent.specialCategory
       : scheme.promoterContributionMinPercent.general;
-    const requiredMarginAmount = (profile.totalProjectCost * requiredMarginPct) / 100;
+    const requiredMarginAmount = Math.round((effectiveProjectCost * requiredMarginPct) / 100);
+    const availableMargin = profile.promoterContributionAvailable ?? Math.round(effectiveProjectCost * 0.05);
 
-    if (profile.promoterContributionAvailable >= requiredMarginAmount) {
+    if (availableMargin >= requiredMarginAmount) {
       score += 5;
-      reasonsWhyMatched.push(`Margin Money: You have ₹${profile.promoterContributionAvailable.toLocaleString('en-IN')}, which meets or exceeds the required ${requiredMarginPct}% promoter contribution.`);
+      reasonsWhyMatched.push(`Margin Money: Available promoter contribution (₹${availableMargin.toLocaleString('en-IN')}) meets or exceeds the required ${requiredMarginPct}%.`);
     } else {
-      conditionsToFulfill.push(`Minimum promoter contribution needed is ${requiredMarginPct}% (₹${requiredMarginAmount.toLocaleString('en-IN')}). You have ₹${profile.promoterContributionAvailable.toLocaleString('en-IN')}.`);
+      conditionsToFulfill.push(`Minimum promoter contribution needed is ${requiredMarginPct}% (₹${requiredMarginAmount.toLocaleString('en-IN')}). Available stated: ₹${availableMargin.toLocaleString('en-IN')}.`);
     }
 
     // Educational qualification checks
@@ -202,7 +233,11 @@ export class SchemeMatchingEngine {
         : (scheme.subsidyRate.generalUrban ?? 0);
     }
 
-    let estimatedSubsidyAmount = Math.round((profile.totalProjectCost * subsidyPct) / 100);
+    let estimatedSubsidyAmount = Math.round((effectiveProjectCost * subsidyPct) / 100);
+    if (scheme.id === 'pm-vishwakarma') {
+      // PM Vishwakarma provides ₹15,000 toolkit e-voucher grant + 8% interest subvention
+      estimatedSubsidyAmount = Math.max(estimatedSubsidyAmount, 15000);
+    }
     if (scheme.subsidyRate.maxSubsidyAmount && estimatedSubsidyAmount > scheme.subsidyRate.maxSubsidyAmount) {
       estimatedSubsidyAmount = scheme.subsidyRate.maxSubsidyAmount;
     }
@@ -229,7 +264,7 @@ export class SchemeMatchingEngine {
     let subsidyOptimizationTip = '';
     if (scheme.id === 'pmegp-2026') {
       if (profile.locationType === 'Urban') {
-        subsidyOptimizationTip = `💡 Subsidy Maximizer: Setting up your unit in an adjacent rural gram panchayat increases your government capital grant from 25% (₹${Math.round(profile.totalProjectCost * 0.25).toLocaleString('en-IN')}) to 35% (₹${Math.round(profile.totalProjectCost * 0.35).toLocaleString('en-IN')}) — an extra ₹${Math.round(profile.totalProjectCost * 0.10).toLocaleString('en-IN')} in free grant!`;
+        subsidyOptimizationTip = `💡 Subsidy Maximizer: Setting up your unit in an adjacent rural gram panchayat increases your government capital grant from 25% (₹${Math.round(effectiveProjectCost * 0.25).toLocaleString('en-IN')}) to 35% (₹${Math.round(effectiveProjectCost * 0.35).toLocaleString('en-IN')}) — an extra ₹${Math.round(effectiveProjectCost * 0.10).toLocaleString('en-IN')} in free grant!`;
       } else {
         subsidyOptimizationTip = '🌟 Maximum Subsidy Active: You are receiving the highest 35% government capital grant for rural marginalized entrepreneurs under PMEGP!';
       }

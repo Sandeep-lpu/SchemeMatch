@@ -182,17 +182,22 @@ Instructions:
 Analyze the provided user description (which may be in English, Hindi, or Hinglish) and extract all entrepreneur demographic, financial, and business attributes into a strictly formatted JSON object.
 
 Allowed Enum Values:
-- category: "SC", "ST", "OBC", "General", "Minority", "SafaiKaramchari"
+- category: "SC", "ST", "OBC", "General", "Minority", "SafaiKaramchari" (ONLY IF EXPLICITLY STATED)
 - gender: "Female", "Male", "Other"
-- locationType: "Rural", "Urban"
+- locationType: "Rural", "Urban" (ONLY IF EXPLICITLY STATED)
 - sector: "Textiles", "AgroAllied", "Services", "Manufacturing", "ArtisanHandicraft", "StreetVending", "Sanitation", "Retail"
 
-Important Rules:
-- Convert amounts like "5 lakh", "5L", "500000", "5 लाख" into integer 500000.
-- If totalProjectCost is not specified, set it to Math.round(requiredLoanAmount * 1.15).
-- Detect disability keywords (Divyang, handicap, disabled) -> isDifferentlyAbled: true.
-- Calculate a confidenceScore (0 to 100) based on how many key attributes were found.
-- Provide a 1-sentence clean English summary.
+CRITICAL EXTRACTION RULES (STRICT NON-HALLUCINATION POLICY):
+1. DO NOT GUESS OR INVENT ATTRIBUTES: If an attribute is NOT mentioned in the text (such as social category/caste, location type Rural/Urban, state, annual income, or education level), you MUST set that field to null.
+   - For example: if the text is "i am sandeep kumar , a men of 30yr , interested in tailoring business loan amount needed is 150000", caste/category is NOT mentioned, so "category": null. Location (village/city/rural/urban) is NOT mentioned, so "locationType": null. State is NOT mentioned, so "state": null.
+2. Gender Extraction: "men", "man", "male", "guy", "ladka", "purush" -> "Male". "women", "woman", "female", "lady", "ladki", "mahila" -> "Female".
+3. Trade & Sector:
+   - "tailoring", "tailor", "darzi", "stitching", "cloth", "garment", "boutique", "apparel" -> sector: "Textiles", tradeType: "Tailoring"
+   - "carpenter", "potter", "blacksmith", "handloom", "weaver", "artisan" -> sector: "ArtisanHandicraft"
+   - "street food", "vendor", "thela", "cart" -> sector: "StreetVending"
+4. Loan Amount: Extract digits like "150000", "1.5 lakh", "1.5L", "150k", "150000 INR" into integer 150000.
+5. If totalProjectCost is not specified, set it to Math.round(requiredLoanAmount * 1.15) if requiredLoanAmount exists, otherwise null.
+6. Return confidenceScore (0 to 100) and a clean English summary.
 
 Output format (Strict JSON):
 {
@@ -222,24 +227,128 @@ Output format (Strict JSON):
       // Clean up nulls
       const cleaned: any = {};
       for (const [key, value] of Object.entries(parsed)) {
-        if (value !== null && value !== undefined) {
+        if (value !== null && value !== undefined && value !== '') {
           cleaned[key] = value;
         }
       }
-      cleaned.confidenceScore = cleaned.confidenceScore || 85;
+      cleaned.confidenceScore = cleaned.confidenceScore || 90;
       cleaned.summary = cleaned.summary || 'Extracted profile details from user description.';
       return cleaned;
     } catch (err) {
-      console.error('Groq profile extraction error:', err);
-      // Heuristic fallback
-      return {
-        category: text.toLowerCase().includes('sc') ? 'SC' : 'OBC',
-        gender: text.toLowerCase().includes('woman') || text.toLowerCase().includes('female') ? 'Female' : 'Male',
-        locationType: text.toLowerCase().includes('village') || text.toLowerCase().includes('rural') ? 'Rural' : 'Urban',
-        confidenceScore: 70,
-        summary: 'Parsed basic parameters from user query.'
-      };
+      console.warn('Groq profile extraction fallback activated:', err);
+      return this.heuristicExtraction(text);
     }
+  }
+
+  /**
+   * Deterministic entity extractor that strictly extracts only stated fields
+   */
+  private heuristicExtraction(text: string) {
+    const lower = text.toLowerCase();
+    const result: any = {
+      isDifferentlyAbled: false,
+      confidenceScore: 88,
+      summary: 'Extracted stated details from user description.'
+    };
+
+    // 1. Name extraction (e.g. "i am sandeep kumar", "my name is sunita devi")
+    const nameMatch = text.match(/(?:i am|my name is|im|i'm)\s+([a-zA-Z\s]+?)(?:,|\.|\bof\b|\ba\b|\baged\b|\byears\b|\binterested\b|\bneed\b|$)/i);
+    if (nameMatch && nameMatch[1]) {
+      const cleanedName = nameMatch[1].trim();
+      if (cleanedName.length > 2 && !['a', 'an', 'the', 'looking', 'interested'].includes(cleanedName.toLowerCase())) {
+        result.fullName = cleanedName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+    }
+
+    // 2. Age extraction (e.g. "30yr", "30 yr", "30 years", "age 30")
+    const ageMatch = text.match(/\b(\d{2})\s*(?:yr|yrs|year|years|yo|saal)?\b/i);
+    if (ageMatch) {
+      const ageNum = parseInt(ageMatch[1], 10);
+      if (ageNum >= 18 && ageNum <= 80) {
+        result.age = ageNum;
+      }
+    }
+
+    // 3. Gender extraction ("men", "man", "male" -> Male; "woman", "women", "female" -> Female)
+    if (/\b(men|man|male|guy|ladka|purush)\b/i.test(lower)) {
+      result.gender = 'Male';
+    } else if (/\b(woman|women|female|lady|ladki|mahila)\b/i.test(lower)) {
+      result.gender = 'Female';
+    } else if (/\b(transgender|trans)\b/i.test(lower)) {
+      result.gender = 'Transgender';
+    }
+
+    // 4. Trade and Sector
+    if (/\b(tailor|tailoring|darzi|stitching|garment|apparel|clothes|boutique)\b/i.test(lower)) {
+      result.sector = 'Textiles';
+      result.tradeType = 'Tailoring';
+    } else if (/\b(handloom|weaver|weaving|potter|blacksmith|carpenter|handicraft|artisan|craft)\b/i.test(lower)) {
+      result.sector = 'ArtisanHandicraft';
+      result.tradeType = lower.includes('weaver') ? 'Weaving' : lower.includes('carpenter') ? 'Carpentry' : 'Artisan Handloom';
+    } else if (/\b(street\s*food|vendor|vending|thela|cart|panipuri|chaat|chai)\b/i.test(lower)) {
+      result.sector = 'StreetVending';
+      result.tradeType = 'Street Food / Vending Cart';
+    } else if (/\b(sanitation|cleaning|safai|waste)\b/i.test(lower)) {
+      result.sector = 'Sanitation';
+      result.tradeType = 'Sanitation / Cleaning Equipment';
+    } else if (/\b(dairy|farming|poultry|agro|food processing)\b/i.test(lower)) {
+      result.sector = 'AgroAllied';
+      result.tradeType = 'Agro-Allied Processing';
+    } else if (/\b(manufacturing|factory|fabrication|workshop)\b/i.test(lower)) {
+      result.sector = 'Manufacturing';
+      result.tradeType = 'Micro Manufacturing Workshop';
+    }
+
+    // 5. Loan Amount (e.g. "150000", "1.5 lakh", "1.5L", "4L", "10 lakh")
+    const lakhMatch = text.match(/(\d+(?:\.\d+)?)\s*(?:lakh|lakhs|lac|lacs|l)\b/i);
+    const rawNumberMatch = text.match(/(?:loan|amount|needed|need|require|required)?\s*(?:is|of|rs\.?|inr|₹)?\s*(\d{5,8})\b/i);
+
+    if (lakhMatch) {
+      const val = parseFloat(lakhMatch[1]);
+      result.requiredLoanAmount = Math.round(val * 100000);
+      result.totalProjectCost = Math.round(result.requiredLoanAmount * 1.15);
+    } else if (rawNumberMatch) {
+      const val = parseInt(rawNumberMatch[1], 10);
+      result.requiredLoanAmount = val;
+      result.totalProjectCost = Math.round(val * 1.15);
+    }
+
+    // 6. Category - ONLY set if explicitly present in text!
+    if (/\b(sc|scheduled caste|dalit)\b/i.test(lower)) {
+      result.category = 'SC';
+    } else if (/\b(st|scheduled tribe|adivasi)\b/i.test(lower)) {
+      result.category = 'ST';
+    } else if (/\b(obc|other backward class)\b/i.test(lower)) {
+      result.category = 'OBC';
+    } else if (/\b(safai karamchari|valmiki)\b/i.test(lower)) {
+      result.category = 'SafaiKaramchari';
+    } else if (/\b(minority|muslim|sikh|christian|jain|buddhist)\b/i.test(lower)) {
+      result.category = 'Minority';
+    } else if (/\b(general|open category)\b/i.test(lower)) {
+      result.category = 'General';
+    }
+
+    // 7. Location Type - ONLY set if explicitly present in text!
+    if (/\b(rural|village|gram|panchayat|dehat)\b/i.test(lower)) {
+      result.locationType = 'Rural';
+    } else if (/\b(urban|city|metro|town|nagar)\b/i.test(lower)) {
+      result.locationType = 'Urban';
+    }
+
+    // 8. State - ONLY set if mentioned
+    const indianStates = ['Bihar', 'Uttar Pradesh', 'Maharashtra', 'Rajasthan', 'Madhya Pradesh', 'West Bengal', 'Gujarat', 'Tamil Nadu', 'Karnataka', 'Punjab', 'Haryana', 'Odisha', 'Kerala', 'Assam', 'Jharkhand'];
+    for (const st of indianStates) {
+      if (new RegExp(`\\b${st}\\b`, 'i').test(text)) {
+        result.state = st;
+        break;
+      }
+    }
+
+    if (/\b(handicap|disabled|divyang|pwd)\b/i.test(lower)) {
+      result.isDifferentlyAbled = true;
+    }
+
+    return result;
   }
 
   /**

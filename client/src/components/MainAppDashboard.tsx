@@ -90,15 +90,15 @@ export const MainAppDashboard: React.FC = () => {
       ]
     },
     {
-      group: '10 Core AI Engines',
+      group: 'Tools & Features',
       items: [
-        { id: 'profile', label: '1. AI Profile Extraction', icon: Cpu, badge: 'AI NLP' },
-        { id: 'matcher', label: '2. Smart Scheme Recommender', icon: Target, badge: `${matchResults.length}` },
-        { id: 'gap', label: '5. Eligibility Gap Analyzer', icon: SearchCheck, badge: 'Diagnostic' },
-        { id: 'whatif', label: '6. What-If Simulator', icon: Sliders, badge: 'Live' },
-        { id: 'calculator', label: '7. Financial Calculator', icon: Calculator, badge: null },
-        { id: 'partners', label: '8. Channel Partner Router', icon: Building2, badge: 'Nodal' },
-        { id: 'documents', label: '9. Document Readiness', icon: FileCheck2, badge: 'OCR' }
+        { id: 'profile', label: 'AI Profile Extraction', icon: Cpu, badge: null },
+        { id: 'matcher', label: 'Smart Scheme Recommender', icon: Target, badge: `${matchResults.length}` },
+        { id: 'gap', label: 'Eligibility Gap Analyzer', icon: SearchCheck, badge: null },
+        { id: 'whatif', label: 'What-If Simulator', icon: Sliders, badge: null },
+        { id: 'calculator', label: 'Financial Calculator', icon: Calculator, badge: null },
+        { id: 'partners', label: 'Channel Partner Router', icon: Building2, badge: null },
+        { id: 'documents', label: 'Document Readiness', icon: FileCheck2, badge: null }
       ]
     },
     {
@@ -134,30 +134,14 @@ export const MainAppDashboard: React.FC = () => {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className="ws-brand-name">SchemeMatch</span>
-                <span className="ws-version-pill">Workspace Pro</span>
               </div>
               <span className="ws-brand-sub">Affirmative Credit & Subsidy Intelligence</span>
             </div>
           </div>
         </div>
 
-        {/* Top Right Controls: Theme, Language, Persona Switcher, User Badge, Logout */}
+        {/* Top Right Controls: Theme, Language, User Badge, Logout */}
         <div className="ws-top-right">
-          {/* Quick Persona Switcher for demonstration */}
-          <div className="ws-persona-selector-wrapper">
-            <span className="ws-persona-label">Persona:</span>
-            <select
-              value={selectedPersonaId}
-              onChange={(e) => selectPersona(e.target.value)}
-              className="ws-persona-select"
-            >
-              {personas.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.avatarEmoji} {p.fullName} ({p.category})
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Language Selector */}
           <div className="ws-header-btn-group">
@@ -318,10 +302,6 @@ export const MainAppDashboard: React.FC = () => {
               {/* Welcome Hero Banner */}
               <div className="glass-panel ws-welcome-card">
                 <div className="ws-welcome-content">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <span className="badge badge-emerald">Active Entrepreneur Workspace</span>
-                    <span className="badge badge-indigo">10 Core Modules Online</span>
-                  </div>
                   <h1 className="ws-welcome-title">
                     Welcome, {user?.fullName?.split(' ')[0] || profile.fullName}! 👋
                   </h1>
@@ -379,12 +359,12 @@ export const MainAppDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* 10 Core Features Grid Showcase */}
+              {/* Features Grid Showcase */}
               <div style={{ marginTop: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                      10 Core Scheme Intelligence Modules
+                      Tools & Features
                     </h2>
                     <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                       Access specialized tools designed for affirmative credit facilitation and bank sanctioning.
@@ -502,7 +482,6 @@ export const MainAppDashboard: React.FC = () => {
           {activeTab === 'profile' && (
             <div className="ws-single-panel">
               <div style={{ marginBottom: '20px' }}>
-                <span className="badge badge-indigo">Module 1 of 10</span>
                 <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: '8px 0 4px 0' }}>
                   AI Profile Extraction & Demographic Alignment
                 </h1>
@@ -520,7 +499,6 @@ export const MainAppDashboard: React.FC = () => {
               <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span className="badge badge-indigo">Module 2 of 10</span>
                     <span className="badge badge-emerald">Affirmative Engine Active</span>
                   </div>
                   <h1 style={{ fontSize: '1.75rem', fontWeight: 700, margin: '0 0 6px 0' }}>

@@ -1,35 +1,52 @@
 import React, { useState, useRef } from 'react';
 import { useProfile } from '../context/ProfileContext';
 import { useLanguage } from '../context/LanguageContext';
+import { SupportedLanguage } from '../types';
 import { getLandingImage } from '../utils/landingImages';
 import { Sparkles, CheckCircle2 } from 'lucide-react';
 
-export const BentoShowcase: React.FC = () => {
-  const { setActiveTab, navigateToFeature, selectPersona } = useProfile();
-  const { language } = useLanguage();
+const bentoTooltips: Record<SupportedLanguage, { search: string; simulator: string; docs: string }> = {
+  en: { search: 'Scheme Search & Matcher', simulator: 'What-If Eligibility Simulator', docs: 'Document Readiness Scanner' },
+  hi: { search: 'योजना खोज व मिलान', simulator: 'क्या-अगर पात्रता सिम्युलेटर', docs: 'दस्तावेज़ तत्परता स्कॅनर' },
+  te: { search: 'పథక శోధన & సరిపోలిక', simulator: 'అర్హత సిమ్యులేటర్', docs: 'పత్రాల సన్నద్ధత స్కానర్' },
+  pa: { search: 'ਸਕੀਮ ਖੋਜ ਅਤੇ ਮੈਚਰ', simulator: 'ਯੋਗਤਾ ਸਿਮੂਲੇਟਰ', docs: 'ਦਸਤਾਵੇਜ਼ ਤਿਆਰੀ ਸਕੈਨਰ' },
+  mr: { search: 'योजना शोध व जुळवणी', simulator: 'पात्रता सिम्युलेटर', docs: 'दस्तावेज सज्जता स्कॅनर' },
+  bn: { search: 'প্রকল্প সন্ধান ও ম্যাচিং', simulator: 'যোগ্যতা সিমুলেটর', docs: 'নথি প্রস্তুতি স্ক্যানার' },
+};
 
-  const targetBentoImg = getLandingImage('bento', language);
+export const BentoShowcase: React.FC = () => {
+  const { setActiveTab, navigateToFeature } = useProfile();
+  const { language, theme } = useLanguage();
+
+  const tt = bentoTooltips[language] || bentoTooltips.en;
+
+  const targetBentoImg = getLandingImage('bento', language, theme);
   const [displayedImg, setDisplayedImg] = useState<string>(targetBentoImg);
   const [isImgReady, setIsImgReady] = useState<boolean>(true);
 
   React.useEffect(() => {
     if (targetBentoImg === displayedImg) return;
-    setIsImgReady(false);
     const img = new Image();
     img.src = targetBentoImg;
-    img.onload = () => {
+    if (img.complete) {
       setDisplayedImg(targetBentoImg);
       setIsImgReady(true);
-    };
-    img.onerror = () => {
-      setDisplayedImg(targetBentoImg);
-      setIsImgReady(true);
-    };
+    } else {
+      img.onload = () => {
+        setDisplayedImg(targetBentoImg);
+        setIsImgReady(true);
+      };
+      img.onerror = () => {
+        setDisplayedImg(targetBentoImg);
+        setIsImgReady(true);
+      };
+    }
   }, [targetBentoImg]);
 
-  // 3D Tilt State
+  // 3D Tilt & Specular Glare State
   const containerRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [glare, setGlare] = useState<{ x: number; y: number; opacity: number }>({ x: 50, y: 50, opacity: 0 });
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
@@ -41,23 +58,28 @@ export const BentoShowcase: React.FC = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    // Subtle 3D tilt (-3.5 deg to +3.5 deg)
+    // Subtle tilt (-3.5 deg to +3.5 deg)
     const rotateX = ((y - centerY) / centerY) * -3.5;
     const rotateY = ((x - centerX) / centerX) * 3.5;
 
+    const glareX = Math.round((x / rect.width) * 100);
+    const glareY = Math.round((y / rect.height) * 100);
+
     setTilt({ x: rotateX, y: rotateY });
+    setGlare({ x: glareX, y: glareY, opacity: 0.14 });
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
     setTilt({ x: 0, y: 0 });
+    setGlare({ x: 50, y: 50, opacity: 0 });
     setActiveTooltip(null);
   };
 
   return (
-    <section className="bento-image-section" id="bento-showcase">
+    <section className="bento-showcase-section" id="bento-showcase">
       <div className="container">
-        {/* 3D Visual Stage with the exact user image asset */}
+        {/* Visual Element Container (Image 3 with 3D Tilt, Glare & Interactive Hotspots) */}
         <div
           ref={containerRef}
           className={`bento-visual-stage ${isHovered ? 'hovered' : ''}`}
@@ -66,7 +88,7 @@ export const BentoShowcase: React.FC = () => {
           onMouseLeave={handleMouseLeave}
           style={{
             transform: isHovered
-              ? `perspective(1400px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.008, 1.008, 1.008)`
+              ? `perspective(1400px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.01, 1.01, 1.01)`
               : undefined
           }}
         >
@@ -79,93 +101,40 @@ export const BentoShowcase: React.FC = () => {
               decoding="async"
             />
 
-            {/* =====================================================================
-                Interactive Hotspot Overlays on the Image
-                ===================================================================== */}
+            {/* Interactive Hotspot Overlays */}
 
-            {/* Tool 1: Scheme Search */}
+            {/* Hotspot 1: Scheme Search */}
             <div
               className="bento-hotspot hotspot-tool-search"
               onClick={() => navigateToFeature('matcher')}
-              onMouseEnter={() => setActiveTooltip('Scheme Search: Discover 23+ Central & MoSJE Schemes')}
+              onMouseEnter={() => setActiveTooltip(tt.search)}
               onMouseLeave={() => setActiveTooltip(null)}
               title="Scheme Search"
             >
               <div className="bento-pulse-dot blue" />
             </div>
 
-            {/* Tool 2: Eligibility Checker & Gap Diagnostic */}
-            <div
-              className="bento-hotspot hotspot-tool-checker"
-              onClick={() => navigateToFeature('gap')}
-              onMouseEnter={() => setActiveTooltip('Eligibility Gap Analyzer: Multi-Factor Diagnostic Rules')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Eligibility Gap Checker"
-            >
-              <div className="bento-pulse-dot green" />
-            </div>
-
-            {/* Tool 3: What-If Simulator */}
+            {/* Hotspot 2: What-If Simulator */}
             <div
               className="bento-hotspot hotspot-tool-simulator"
               onClick={() => navigateToFeature('whatif')}
-              onMouseEnter={() => setActiveTooltip('What-If Simulator: Calculate 35% Subsidies & DSCR in Real-Time')}
+              onMouseEnter={() => setActiveTooltip(tt.simulator)}
               onMouseLeave={() => setActiveTooltip(null)}
               title="What-If Simulator"
             >
               <div className="bento-pulse-dot pink" />
             </div>
 
-            {/* Tool 4: Scheme Comparison */}
-            <div
-              className="bento-hotspot hotspot-tool-comparison"
-              onClick={() => navigateToFeature('comparison')}
-              onMouseEnter={() => setActiveTooltip('Scheme Comparison: Side-by-side terms, subsidies & interest')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Scheme Comparison"
-            >
-              <div className="bento-pulse-dot purple" />
-            </div>
-
-            {/* Tool 5: Document Checklist */}
+            {/* Hotspot 3: Document Readiness */}
             <div
               className="bento-hotspot hotspot-tool-docs"
               onClick={() => navigateToFeature('documents')}
-              onMouseEnter={() => setActiveTooltip('Document Readiness: Digital OCR & Readiness Verification')}
+              onMouseEnter={() => setActiveTooltip(tt.docs)}
               onMouseLeave={() => setActiveTooltip(null)}
               title="Document Readiness"
             >
               <div className="bento-pulse-dot amber" />
             </div>
-
-            {/* Tool 6: Application Tracker */}
-            <div
-              className="bento-hotspot hotspot-tool-tracker"
-              onClick={() => navigateToFeature('roadmap')}
-              onMouseEnter={() => setActiveTooltip('Application Tracker: 6-Stage Nodal Clearance Milestones')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Application Tracker"
-            >
-              <div className="bento-pulse-dot gold" />
-            </div>
-
-            {/* Profile Selection Hotspot: SC/ST & Rural Popover */}
-            <div
-              className="bento-hotspot hotspot-profile-popover"
-              onClick={() => { selectPersona('sunita-weaver'); navigateToFeature('matcher'); }}
-              onMouseEnter={() => setActiveTooltip('Targeted Profile: Sunita Devi (SC Handloom Weaver) • 96% Match')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Select SC Artisan Profile"
-            />
-
-            {/* Smart Tasks Hotspot */}
-            <div
-              className="bento-hotspot hotspot-tasks"
-              onClick={() => navigateToFeature('roadmap')}
-              onMouseEnter={() => setActiveTooltip('Smart Tasks: Assign & Track Application Milestones')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Smart Tasks"
-            />
 
             {/* Floating Action Tooltip */}
             {activeTooltip && (

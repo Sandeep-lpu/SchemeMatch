@@ -1,0 +1,287 @@
+[
+  {
+    "id": "upscfdc-vns-hq",
+    "name": "Uttar Pradesh SC Finance & Development Corp. (UPSCFDC)",
+    "type": "SCA",
+    "typeFullName": "State Channelising Agency",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221002",
+    "coordinates": {
+      "lat": 25.3345,
+      "lng": 82.9812
+    },
+    "branchName": "District Vikas Bhawan Branch, Kachehri",
+    "nodalOfficer": "Shri R. K. Gautam (District Manager - MoSJE Operations)",
+    "phone": "+91 542 2508192",
+    "email": "dm-varanasi@upscfdc.gov.in",
+    "address": "Room 204, 2nd Floor, Vikas Bhawan, Kachehri, Varanasi - 221002",
+    "authorizedSchemes": [
+      "nsfdc-term-loan",
+      "visvas-scheme",
+      "pm-vishwakarma",
+      "mahila-samriddhi",
+      "laghu-vyavsay",
+      "special-central-assistance"
+    ],
+    "supportedLoanTypes": [
+      "Term Loan",
+      "Composite Loan",
+      "Micro-Credit"
+    ],
+    "minLoanAmount": 25000,
+    "maxLoanAmount": 5000000,
+    "allowedBeneficiaryCategories": [
+      "SC",
+      "SafaiKaramchari",
+      "DNT",
+      "ArtisanHandicraft"
+    ],
+    "isCurrentlyRoutingEligible": true,
+    "approvalRate": 94,
+    "avgSanctionDays": 14,
+    "specialFeatures": [
+      "Direct MoSJE Apex Credit Guarantee",
+      "5% Interest Subvention (VISVAS) Handled Directly",
+      "Concessional Margin Money for SC/Safai Karamchari"
+    ]
+  },
+  {
+    "id": "dic-vns-pmegp",
+    "name": "District Industries Centre (DIC) / KVIC Varanasi",
+    "type": "DIC",
+    "typeFullName": "District Industries Centre & KVIC Hub",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221002",
+    "coordinates": {
+      "lat": 25.3289,
+      "lng": 82.9754
+    },
+    "branchName": "District Task Force Office, Chaukaghat",
+    "nodalOfficer": "Shri Mohan Lal Yadav (General Manager - DIC)",
+    "phone": "+91 542 2204512",
+    "email": "gmdic-vns@up.gov.in",
+    "address": "DIC Complex, Chaukaghat, Varanasi - 221002",
+    "authorizedSchemes": [
+      "pmegp-2026",
+      "pm-vishwakarma",
+      "sfurti-cluster",
+      "cgtmse-guarantee"
+    ],
+    "supportedLoanTypes": [
+      "Term Loan",
+      "Composite Loan",
+      "Working Capital"
+    ],
+    "minLoanAmount": 100000,
+    "maxLoanAmount": 5000000,
+    "allowedBeneficiaryCategories": [
+      "SC",
+      "ST",
+      "OBC",
+      "General",
+      "Minority",
+      "SafaiKaramchari",
+      "DNT",
+      "Women",
+      "DifferentlyAbled"
+    ],
+    "isCurrentlyRoutingEligible": true,
+    "approvalRate": 92,
+    "avgSanctionDays": 10,
+    "specialFeatures": [
+      "Direct PMEGP 25%-35% Capital Subsidy Nodal Agency",
+      "EDP Training Integration & Certification",
+      "Task Force Committee Weekly Sanctions"
+    ]
+  },
+  {
+    "id": "sbi-sme-cantt",
+    "name": "State Bank of India (SBI) - SME City Credit Center",
+    "type": "PSB",
+    "typeFullName": "Public Sector Bank",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221002",
+    "coordinates": {
+      "lat": 25.3401,
+      "lng": 82.9905
+    },
+    "branchName": "SME City Credit Center, Mall Road, Cantt",
+    "nodalOfficer": "Ms. Priyadarshini Rao (Chief Manager - SME Lending)",
+    "phone": "+91 542 2221045",
+    "email": "smeccc.varanasi@sbi.co.in",
+    "address": "SBI Building, Mall Road, Cantt, Varanasi - 221002",
+    "authorizedSchemes": [
+      "pmegp-2026",
+      "stand-up-india",
+      "pm-vishwakarma",
+      "mudra-kishor",
+      "mudra-tarun",
+      "cgtmse-guarantee"
+    ],
+    "supportedLoanTypes": [
+      "Term Loan",
+      "Working Capital",
+      "Composite Loan"
+    ],
+    "minLoanAmount": 50000,
+    "maxLoanAmount": 10000000,
+    "allowedBeneficiaryCategories": [
+      "SC",
+      "ST",
+      "OBC",
+      "General",
+      "Minority",
+      "SafaiKaramchari",
+      "Women"
+    ],
+    "isCurrentlyRoutingEligible": true,
+    "approvalRate": 88,
+    "avgSanctionDays": 12,
+    "specialFeatures": [
+      "Lead Bank District Office",
+      "Stand-Up India Greenfield Specialist",
+      "High Ticket Term Loans up to ₹1 Crore"
+    ]
+  },
+  {
+    "id": "baroda-up-bank-rural",
+    "name": "Baroda UP Bank (Sponsored by Bank of Baroda)",
+    "type": "RRB",
+    "typeFullName": "Regional Rural Bank",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221010",
+    "coordinates": {
+      "lat": 25.3056,
+      "lng": 82.9841
+    },
+    "branchName": "Regional Rural Lending Desk, Mahmoorganj",
+    "nodalOfficer": "Shri Amit Srivastava (Agri & Micro Enterprise Head)",
+    "phone": "+91 542 2503341",
+    "email": "rovaranasi@barodauprrb.co.in",
+    "address": "B-38/1-K, Mahmoorganj Road, Varanasi - 221010",
+    "authorizedSchemes": [
+      "pmegp-2026",
+      "pm-vishwakarma",
+      "mudra-shishu",
+      "mudra-kishor",
+      "kcc-artisan",
+      "visvas-scheme"
+    ],
+    "supportedLoanTypes": [
+      "Term Loan",
+      "Micro-Credit",
+      "Working Capital"
+    ],
+    "minLoanAmount": 20000,
+    "maxLoanAmount": 2500000,
+    "allowedBeneficiaryCategories": [
+      "SC",
+      "ST",
+      "OBC",
+      "General",
+      "ArtisanHandicraft",
+      "Women"
+    ],
+    "isCurrentlyRoutingEligible": true,
+    "approvalRate": 91,
+    "avgSanctionDays": 8,
+    "specialFeatures": [
+      "Fastest Rural & Semi-Urban Branch Turnaround",
+      "Weaver & Tailor Cluster Specialist",
+      "Zero Collateral Guarantee via CGTMSE"
+    ]
+  },
+  {
+    "id": "pnb-sigra-sastra",
+    "name": "Punjab National Bank (PNB) - MSME Sastra Hub",
+    "type": "PSB",
+    "typeFullName": "Public Sector Bank",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221002",
+    "coordinates": {
+      "lat": 25.3211,
+      "lng": 82.9867
+    },
+    "branchName": "MSME Circle Sastra Center, Sigra Chauraha",
+    "nodalOfficer": "Shri Alok Kumar Verma (Circle Head - Credit)",
+    "phone": "+91 542 2226710",
+    "email": "co.varanasi@pnb.co.in",
+    "address": "Sigra Chauraha, Vidyapeeth Road, Varanasi - 221002",
+    "authorizedSchemes": [
+      "pmegp-2026",
+      "stand-up-india",
+      "pm-svanidhi",
+      "mudra-kishor",
+      "mudra-tarun"
+    ],
+    "supportedLoanTypes": [
+      "Term Loan",
+      "Working Capital"
+    ],
+    "minLoanAmount": 100000,
+    "maxLoanAmount": 10000000,
+    "allowedBeneficiaryCategories": [
+      "SC",
+      "ST",
+      "OBC",
+      "General",
+      "Women"
+    ],
+    "isCurrentlyRoutingEligible": false,
+    "approvalRate": 85,
+    "avgSanctionDays": 16,
+    "specialFeatures": [
+      "Urban Enterprise Specialist",
+      "Working Capital Cash Credit Lines"
+    ]
+  },
+  {
+    "id": "annapurna-mfi-chitaipur",
+    "name": "Annapurna Microfinance (SIDBI & NABARD Partner)",
+    "type": "NBFC-MFI",
+    "typeFullName": "Concessional Micro-Finance Institution",
+    "state": "Uttar Pradesh",
+    "district": "Varanasi",
+    "pincode": "221005",
+    "coordinates": {
+      "lat": 25.2812,
+      "lng": 82.9614
+    },
+    "branchName": "Chitaipur Artisan & Women Hub",
+    "nodalOfficer": "Smt. Kavita Sharma (Cluster Head)",
+    "phone": "+91 94152 87311",
+    "email": "varanasi.cluster@ampl.net.in",
+    "address": "Plot 14, Sunderpur Near BHU Gate, Varanasi - 221005",
+    "authorizedSchemes": [
+      "pm-svanidhi",
+      "mudra-shishu",
+      "shg-linkage",
+      "artisan-micro-credit"
+    ],
+    "supportedLoanTypes": [
+      "Micro-Credit",
+      "Working Capital"
+    ],
+    "minLoanAmount": 10000,
+    "maxLoanAmount": 200000,
+    "allowedBeneficiaryCategories": [
+      "Women",
+      "SC",
+      "OBC",
+      "StreetVending"
+    ],
+    "isCurrentlyRoutingEligible": true,
+    "approvalRate": 96,
+    "avgSanctionDays": 4,
+    "specialFeatures": [
+      "Doorstep Document Verification",
+      "Instant Loan Sanction under 4 Days",
+      "Weekly/Fortnightly Easy Micro-Installments"
+    ]
+  }
+]

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, SchemeMatchResult, PersonaProfile, Scheme } from '../types';
 import { SAMPLE_PERSONAS } from '../data/samplePersonas';
+import { useAuth } from './AuthContext';
 
 interface ProfileContextType {
   profile: UserProfile;
@@ -38,10 +39,14 @@ interface ProfileContextType {
 
   // Aggregate stats
   totalPotentialSubsidy: number;
+
+  // Raw scheme repository
+  allSchemes: Scheme[];
+  fetchAllSchemes: () => Promise<Scheme[]>;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
-  fullName: 'Sunita Devi',
+  fullName: 'Entrepreneur',
   age: 32,
   gender: 'Female',
   category: 'SC',
@@ -70,9 +75,10 @@ const DEFAULT_PROFILE: UserProfile = {
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { setCurrentView } = useAuth();
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [personas, setPersonas] = useState<PersonaProfile[]>(SAMPLE_PERSONAS);
-  const [selectedPersonaId, setSelectedPersonaId] = useState<string>('sunita-weaver');
+  const [selectedPersonaId, setSelectedPersonaId] = useState<string>('sunita-devi');
   const [matchResults, setMatchResults] = useState<SchemeMatchResult[]>([]);
   const [otherSchemes, setOtherSchemes] = useState<SchemeMatchResult[]>([]);
   const [isLoadingMatches, setIsLoadingMatches] = useState<boolean>(false);
@@ -83,7 +89,25 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedSchemeModal, setSelectedSchemeModal] = useState<SchemeMatchResult | null>(null);
   const [uploadedDocIds, setUploadedDocIds] = useState<string[]>(['aadhaar-card', 'caste-certificate', 'bank-statement']);
 
-  // Fetch personas on load
+  const [allSchemes, setAllSchemes] = useState<Scheme[]>([]);
+
+  // Method to fetch all government schemes from backend repository
+  const fetchAllSchemes = async (): Promise<Scheme[]> => {
+    try {
+      const res = await fetch('http://localhost:5000/api/schemes');
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.schemes || [];
+        setAllSchemes(list);
+        return list;
+      }
+    } catch (err) {
+      console.warn('Backend schemes fetch failed:', err);
+    }
+    return [];
+  };
+
+  // Fetch personas and full scheme repository on load
   useEffect(() => {
     const fetchPersonas = async () => {
       try {
@@ -99,6 +123,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     };
     fetchPersonas();
+    fetchAllSchemes();
   }, []);
 
   // Run matching whenever profile changes or requested
@@ -151,17 +176,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSelectedSchemeModal(found);
       }
     }
-    if (opts?.scroll !== false) {
-      setTimeout(() => {
-        const el = document.getElementById('interactive-workspace');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          el.classList.remove('workspace-highlight-active');
-          void el.offsetWidth; // trigger reflow
-          el.classList.add('workspace-highlight-active');
-        }
-      }, 60);
-    }
+    setCurrentView('app');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const updateProfileField = <K extends keyof UserProfile>(field: K, value: UserProfile[K]) => {
@@ -234,7 +250,9 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSelectedSchemeModal,
     uploadedDocIds,
     toggleDocumentUpload,
-    totalPotentialSubsidy
+    totalPotentialSubsidy,
+    allSchemes,
+    fetchAllSchemes
   };
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;

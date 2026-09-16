@@ -1,6 +1,6 @@
-export type SocialCategory = 'SC' | 'ST' | 'OBC' | 'General' | 'Minority' | 'SafaiKaramchari' | 'DNT';
-export type Gender = 'Male' | 'Female' | 'Transgender' | 'Other';
-export type LocationType = 'Rural' | 'Urban' | 'Semi-Urban';
+export type SocialCategory = 'SC' | 'ST' | 'OBC' | 'General' | 'Minority' | 'SafaiKaramchari' | 'DNT' | '';
+export type Gender = 'Male' | 'Female' | 'Transgender' | 'Other' | '';
+export type LocationType = 'Rural' | 'Urban' | 'Semi-Urban' | '';
 export type EnterpriseStage = 'Ideation' | 'NewEnterprise' | 'ExistingExpansion';
 export type SectorType = 
   | 'Manufacturing' 
@@ -10,7 +10,8 @@ export type SectorType =
   | 'AgroAllied' 
   | 'StreetVending' 
   | 'Sanitation' 
-  | 'Textiles';
+  | 'Textiles'
+  | '';
 
 export type EducationLevel = 
   | 'Below8th' 
@@ -236,3 +237,53 @@ export interface ChatMessage {
 }
 
 export type SupportedLanguage = 'en' | 'hi' | 'te' | 'mr' | 'bn' | 'pa';
+
+export interface EvaluatedPartner {
+  id: string;
+  name: string;
+  type: 'SCA' | 'PSB' | 'RRB' | 'NBFC-MFI' | 'DIC';
+  typeFullName: string;
+  state: string;
+  district: string;
+  pincode: string;
+  coordinates: { lat: number; lng: number };
+  branchName: string;
+  nodalOfficer: string;
+  phone: string;
+  email: string;
+  address: string;
+  authorizedSchemes: string[];
+  supportedLoanTypes: string[];
+  minLoanAmount: number;
+  maxLoanAmount: number;
+  allowedBeneficiaryCategories: string[];
+  isCurrentlyRoutingEligible: boolean;
+  approvalRate: number;
+  avgSanctionDays: number;
+  specialFeatures: string[];
+  distanceKm: number;
+  routingStatus: 'Recommended' | 'Limited' | 'Not eligible';
+  statusBadgeColor: 'green' | 'yellow' | 'red';
+  statusReason: string;
+  verificationChecks: {
+    authorizedForScheme: boolean;
+    handlesLoanCategory: boolean;
+    suitableForCategory: boolean;
+    eligibleForRouting: boolean;
+  };
+  directionsUrl: string;
+}
+
+export interface PartnerRoutingResult {
+  decisionPipeline: {
+    userLocation: string;
+    selectedScheme: string;
+    loanCategory: string;
+    loanAmount: number;
+    authorizedPartnersCount: number;
+    recommendedPartnersCount: number;
+  };
+  recommendedPartner: EvaluatedPartner | null;
+  allRankedPartners: EvaluatedPartner[];
+  evaluatedAt: string;
+}

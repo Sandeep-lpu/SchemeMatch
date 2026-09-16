@@ -1,30 +1,46 @@
 import React, { useState, useRef } from 'react';
 import { useProfile } from '../context/ProfileContext';
 import { useLanguage } from '../context/LanguageContext';
+import { SupportedLanguage } from '../types';
 import { getLandingImage } from '../utils/landingImages';
 import { Sparkles, MapPin, Compass, CheckCircle2, ArrowRight, Building2, Scale, ShieldCheck } from 'lucide-react';
 
+const spTooltips: Record<SupportedLanguage, { discover: string; topMatch: string; compare: string; partners: string }> = {
+  en: { discover: 'Discover Matching Schemes', topMatch: 'View Top Match Details', compare: 'Compare Schemes Side-by-Side', partners: 'Find Channel Partners' },
+  hi: { discover: 'अनुकूल योजनाएं खोजें', topMatch: 'सर्वश्रेष्ठ मिलान देखें', compare: 'योजनाओं की साथ-साथ तुलना करें', partners: 'निकटतम चैनल पार्टनर खोजें' },
+  te: { discover: 'సరిపోయే పథకాలను కనుగొనండి', topMatch: 'ఉత్తమ పథక వివరాలు చూడండి', compare: 'పథకాలను పోల్చండి', partners: 'చానల్ భాగస్వాములను కనుగొనండి' },
+  pa: { discover: 'ਸਹੀ ਸਕੀਮਾਂ ਲੱਭੋ', topMatch: 'ਸਿਖਰਲੀ ਸਕੀਮ ਵੇਰਵੇ ਵੇਖੋ', compare: 'ਸਕੀਮਾਂ ਦੀ ਤੁਲਨਾ ਕਰੋ', partners: 'ਚੈਨਲ ਭਾਗੀਦਾਰ ਲੱਭੋ' },
+  mr: { discover: 'योग्य योजना शोधा', topMatch: 'सर्वोत्तम योजनेचे तपशील पहा', compare: 'योजनांची तुलना करा', partners: 'चॅनेल पार्टनर शोधा' },
+  bn: { discover: 'উপযুক্ত প্রকল্প খুঁজুন', topMatch: 'সেরা প্রকল্পের বিবরণ দেখুন', compare: 'প্রকল্প তুলনা করুন', partners: 'চ্যানেল পার্টনার খুঁজুন' },
+};
+
 export const SuperpoweredCardsSection: React.FC = () => {
   const { setActiveTab, navigateToFeature, setSelectedSchemeModal, matchResults } = useProfile();
-  const { t, language } = useLanguage();
+  const { t, language, theme } = useLanguage();
 
-  const targetSpImg = getLandingImage('superpowered', language);
+  const tt = spTooltips[language] || spTooltips.en;
+
+  const targetSpImg = getLandingImage('superpowered', language, theme);
   const [displayedImg, setDisplayedImg] = useState<string>(targetSpImg);
   const [isImgReady, setIsImgReady] = useState<boolean>(true);
 
   React.useEffect(() => {
     if (targetSpImg === displayedImg) return;
-    setIsImgReady(false);
     const img = new Image();
     img.src = targetSpImg;
-    img.onload = () => {
+    if (img.complete) {
       setDisplayedImg(targetSpImg);
       setIsImgReady(true);
-    };
-    img.onerror = () => {
-      setDisplayedImg(targetSpImg);
-      setIsImgReady(true);
-    };
+    } else {
+      img.onload = () => {
+        setDisplayedImg(targetSpImg);
+        setIsImgReady(true);
+      };
+      img.onerror = () => {
+        setDisplayedImg(targetSpImg);
+        setIsImgReady(true);
+      };
+    }
   }, [targetSpImg]);
 
   // 3D Tilt & Specular Glare State
@@ -121,117 +137,48 @@ export const SuperpoweredCardsSection: React.FC = () => {
               }}
             />
 
-            {/* --- CARD 1 (LEFT: Discovery & Category Filter) --- */}
-            {/* Hotspot 1: Start a Business Button */}
+            {/* Hotspot 1: Scheme Discovery */}
             <div
               className="sp-hotspot sp-hotspot-start-biz"
               onClick={() => navigateToFeature('matcher')}
-              onMouseEnter={() => setActiveTooltip('Filter Schemes for Micro & Small Business Startups')}
+              onMouseEnter={() => setActiveTooltip(tt.discover)}
               onMouseLeave={() => setActiveTooltip(null)}
-              title="Start a Business Discovery"
+              title="Discover Schemes"
             >
               <div className="sp-pulse-ring blue" />
             </div>
 
-            {/* Hotspot 2: Recent Activity (Viewed Term Loan Scheme) */}
-            <div
-              className="sp-hotspot sp-hotspot-recent-loan"
-              onClick={handleOpenTermLoan}
-              onMouseEnter={() => setActiveTooltip('Resume Application: NSFDC Term Loan Scheme')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Resume NSFDC Term Loan"
-            >
-              <div className="sp-pulse-ring orange" />
-            </div>
-
-            {/* --- CARD 2 (CENTER: Top Match Term Loan Scheme) --- */}
-            {/* Hotspot 3: Term Loan Scheme 96% Match Header */}
+            {/* Hotspot 2: Top Match Details */}
             <div
               className="sp-hotspot sp-hotspot-header"
               onClick={handleOpenTermLoan}
-              onMouseEnter={() => setActiveTooltip('Open MoSJE Term Loan Scheme Details & 96% Match Dossier')}
+              onMouseEnter={() => setActiveTooltip(tt.topMatch)}
               onMouseLeave={() => setActiveTooltip(null)}
-              title="View Top Match Details"
+              title="View Top Match"
             >
               <div className="sp-pulse-ring green" />
             </div>
 
-            {/* Hotspot 4: Key Highlights (Up to ₹50 Lakh @ 6.5%-8%) */}
-            <div
-              className="sp-hotspot sp-hotspot-highlights"
-              onClick={handleOpenTermLoan}
-              onMouseEnter={() => setActiveTooltip('Loan Amount: Up to ₹50 Lakh • Moratorium: 3-12 Months')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Loan Terms & Moratorium"
-            >
-              <div className="sp-pulse-ring green" />
-            </div>
-
-            {/* Hotspot 5: 96% Match Circular Score Gauge */}
-            <div
-              className="sp-hotspot sp-hotspot-match-ring"
-              onClick={handleOpenTermLoan}
-              onMouseEnter={() => setActiveTooltip('96% High-Confidence Eligibility Fit (SC Verified, Capex within Limit)')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="96% Eligibility Fit"
-            >
-              <div className="sp-pulse-ring green" />
-            </div>
-
-            {/* Hotspot 6: [View Full Details ->] Button */}
-            <div
-              className="sp-hotspot sp-hotspot-view-details"
-              onClick={handleOpenTermLoan}
-              onMouseEnter={() => setActiveTooltip('Open Complete Scheme Breakdown & DPR Requirements')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="View Full Details"
-            >
-              <div className="sp-pulse-ring green" />
-            </div>
-
-            {/* Hotspot 7: [⚖️ Compare Schemes] Button */}
+            {/* Hotspot 3: Compare Schemes */}
             <div
               className="sp-hotspot sp-hotspot-compare-schemes"
               onClick={() => navigateToFeature('comparison')}
-              onMouseEnter={() => setActiveTooltip('Compare Term Loan vs PMEGP vs Stand-Up India Matrix')}
+              onMouseEnter={() => setActiveTooltip(tt.compare)}
               onMouseLeave={() => setActiveTooltip(null)}
               title="Compare Schemes"
             >
               <div className="sp-pulse-ring blue" />
             </div>
 
-            {/* --- CARD 3 (RIGHT: Authorized Channel Partners) --- */}
-            {/* Hotspot 8: View on Map Button */}
+            {/* Hotspot 4: Channel Partners */}
             <div
               className="sp-hotspot sp-hotspot-map-btn"
               onClick={() => navigateToFeature('partners')}
-              onMouseEnter={() => setActiveTooltip('View Authorized Channel Partners on Interactive Nodal Map')}
+              onMouseEnter={() => setActiveTooltip(tt.partners)}
               onMouseLeave={() => setActiveTooltip(null)}
-              title="View Channel Partners"
+              title="Channel Partners"
             >
               <div className="sp-pulse-ring purple" />
-            </div>
-
-            {/* Hotspot 9: State Bank of India Eligible Row */}
-            <div
-              className="sp-hotspot sp-hotspot-sbi-partner"
-              onClick={() => navigateToFeature('partners')}
-              onMouseEnter={() => setActiveTooltip('State Bank of India (Patna Main Branch) • Authorized Nodal Desk')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="SBI Main Branch Patna"
-            >
-              <div className="sp-pulse-ring green" />
-            </div>
-
-            {/* Hotspot 10: [✈️ Get Directions ->] Button */}
-            <div
-              className="sp-hotspot sp-hotspot-get-directions"
-              onClick={() => navigateToFeature('partners')}
-              onMouseEnter={() => setActiveTooltip('Get Navigation Directions to Nearest Nodal Bank Branch')}
-              onMouseLeave={() => setActiveTooltip(null)}
-              title="Get Directions"
-            >
-              <div className="sp-pulse-ring blue" />
             </div>
 
             {/* Dynamic Floating Interactive Live Tooltip */}

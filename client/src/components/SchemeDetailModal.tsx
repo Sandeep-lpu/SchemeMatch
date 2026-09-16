@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useProfile } from '../context/ProfileContext';
 import { useLanguage } from '../context/LanguageContext';
-import { X, ExternalLink, Check, Volume2, ShieldCheck, Clock, FileText, Building, Sparkles, RefreshCw } from 'lucide-react';
+import { X, ExternalLink, Check, Volume2, VolumeX, ShieldCheck, Clock, FileText, Building, Sparkles, RefreshCw } from 'lucide-react';
 
 export const SchemeDetailModal: React.FC = () => {
   const { selectedSchemeModal, setSelectedSchemeModal, profile } = useProfile();
-  const { speakText, language } = useLanguage();
+  const { speakText, stopSpeech, isSpeaking, language } = useLanguage();
   const [aiExplanation, setAiExplanation] = useState<any>(null);
   const [loadingAi, setLoadingAi] = useState<boolean>(false);
 
@@ -44,9 +44,34 @@ export const SchemeDetailModal: React.FC = () => {
 
   const { scheme, matchScore, estimatedSubsidyAmount } = selectedSchemeModal;
 
-  const handleSpeak = () => {
-    const text = `${scheme.name}. ${scheme.detailedOverview}. Maximum loan limit is ₹${scheme.maxLoanAmount.toLocaleString('en-IN')}. Nodal agency is ${scheme.nodalAgency}.`;
-    speakText(text);
+  const handleToggleSpeak = () => {
+    if (isSpeaking) {
+      stopSpeech();
+    } else {
+      let text = '';
+      const loanFmt = `₹${scheme.maxLoanAmount.toLocaleString('en-IN')}`;
+      switch (language) {
+        case 'hi':
+          text = `${scheme.hindiName || scheme.name}। ${scheme.hindiSummary || scheme.detailedOverview}। अधिकतम ऋण राशि ${loanFmt}। नोडल एजेंसी: ${scheme.nodalAgency}।`;
+          break;
+        case 'te':
+          text = `${scheme.name} పథకం. ${scheme.detailedOverview}. గరిష్ట రుణ మొత్తం ${loanFmt}. నోడల్ ఏజెన్సీ: ${scheme.nodalAgency}.`;
+          break;
+        case 'pa':
+          text = `${scheme.name} ਸਕੀਮ. ${scheme.detailedOverview}. ਵੱਧ ਤੋਂ ਵੱਧ ਕਰਜ਼ਾ ${loanFmt}. ਨੋਡਲ ਏਜੰਸੀ: ${scheme.nodalAgency}.`;
+          break;
+        case 'mr':
+          text = `${scheme.hindiName || scheme.name} योजना. ${scheme.hindiSummary || scheme.detailedOverview}। कमाल कर्ज मर्यादा ${loanFmt}। नोडल एजन्सी: ${scheme.nodalAgency}।`;
+          break;
+        case 'bn':
+          text = `${scheme.hindiName || scheme.name} প্রকল্প। ${scheme.hindiSummary || scheme.detailedOverview}। সর্বোচ্চ ঋণ সীমা ${loanFmt}। নোডাল এজেন্সি: ${scheme.nodalAgency}।`;
+          break;
+        default:
+          text = `${scheme.name}. ${scheme.detailedOverview}. Maximum loan limit is ${loanFmt}. Nodal agency is ${scheme.nodalAgency}.`;
+          break;
+      }
+      speakText(text);
+    }
   };
 
   return (
@@ -85,7 +110,7 @@ export const SchemeDetailModal: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Sparkles size={16} style={{ color: '#4F46E5' }} />
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Explainable Match Score (Powered by Groq AI)
+                Explainable Match Score (AI Intelligence)
               </span>
             </div>
             {loadingAi && (
@@ -129,11 +154,26 @@ export const SchemeDetailModal: React.FC = () => {
             <h4 style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>Overview & Objectives</h4>
             <button
               className="btn-secondary"
-              onClick={handleSpeak}
-              style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+              onClick={handleToggleSpeak}
+              style={{
+                padding: '6px 12px',
+                fontSize: '0.8rem',
+                color: isSpeaking ? '#16A34A' : undefined,
+                borderColor: isSpeaking ? '#16A34A' : undefined
+              }}
+              title={isSpeaking ? 'Stop Audio' : 'Listen Aloud'}
             >
-              <Volume2 size={14} style={{ color: 'var(--primary-saffron)' }} />
-              <span>Listen Aloud</span>
+              {isSpeaking ? (
+                <>
+                  <VolumeX size={14} style={{ color: '#16A34A' }} />
+                  <span>Stop Audio</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 size={14} style={{ color: 'var(--primary-saffron)' }} />
+                  <span>Listen Aloud</span>
+                </>
+              )}
             </button>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: '1.6' }}>
