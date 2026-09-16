@@ -6,7 +6,8 @@ import {
   Send, Mic, MicOff, X, Sparkles, Volume2, ChevronRight, ChevronLeft,
   ChevronDown, ChevronUp, CheckCircle2, XCircle, AlertTriangle, Check,
   ExternalLink, Upload, FileText, IndianRupee, Target, Search,
-  BookOpen, TrendingUp, Building2, Compass, Calculator, Sliders, Menu
+  BookOpen, TrendingUp, Building2, Compass, Calculator, Sliders, Menu,
+  RotateCcw
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -210,22 +211,103 @@ function buildDefaultProfile(p: Partial<UserProfile>): UserProfile {
 
 const QuickActionsPanel: React.FC<{ onAction: (q: string) => void; lang: ChatLang }> = ({ onAction, lang }) => {
   const actions = [
-    { icon: '🔎', en: 'Find a Scheme', hi: 'योजना खोजें', pa: 'ਸਕੀਮ ਲੱਭੋ', q: 'I want to find a government scheme for my business' },
-    { icon: '✅', en: 'Check Eligibility', hi: 'पात्रता जांचें', pa: 'ਯੋਗਤਾ ਜਾਂਚੋ', q: 'Check my eligibility for government schemes' },
-    { icon: '📋', en: 'Documents Needed', hi: 'दस्तावेज़ जांचें', pa: 'ਦਸਤਾਵੇਜ਼', q: 'What documents do I need to apply?' },
-    { icon: '💰', en: 'Calculate EMI', hi: 'EMI कैलकुलेटर', pa: 'EMI ਕੈਲਕੁਲੇਟਰ', q: 'Calculate my EMI for a 4 lakh loan for 5 years at 7%' },
-    { icon: '📄', en: 'Project Report', hi: 'प्रोजेक्ट रिपोर्ट', pa: 'ਪ੍ਰੋਜੈਕਟ ਰਿਪੋਰਟ', q: "I don't have a project report, help me create one" },
-    { icon: '🏦', en: 'Where to Apply', hi: 'कहाँ अप्लाई करें', pa: 'ਕਿੱਥੇ ਅਪਲਾਈ', q: 'Where should I apply for my loan?' },
+    {
+      icon: <Search size={14} />,
+      bg: '#EFF6FF',
+      color: '#2563EB',
+      en: 'Find a Scheme',
+      hi: 'योजना खोजें',
+      pa: 'ਸਕੀਮ ਲੱਭੋ',
+      subEn: 'Loans & Subsidies',
+      subHi: 'व्यवसाय व लोन अनुसार',
+      subPa: 'ਕਰਜ਼ਾ ਅਤੇ ਸਬਸਿਡੀ',
+      q: 'I want to find a government scheme for my business'
+    },
+    {
+      icon: <CheckCircle2 size={14} />,
+      bg: '#ECFDF5',
+      color: '#059669',
+      en: 'Check Eligibility',
+      hi: 'पात्रता जांचें',
+      pa: 'ਯੋਗਤਾ ਜਾਂਚੋ',
+      subEn: 'Instant rule check',
+      subHi: 'तुरंत पात्रता स्कोर',
+      subPa: 'ਤੁਰੰਤ ਨਿਯਮ ਜਾਂਚ',
+      q: 'Check my eligibility for government schemes'
+    },
+    {
+      icon: <FileText size={14} />,
+      bg: '#FFFBEB',
+      color: '#D97706',
+      en: 'Documents Needed',
+      hi: 'दस्तावेज़ सूची',
+      pa: 'ਦਸਤਾਵੇਜ਼ ਸੂਚੀ',
+      subEn: 'Mandatory checklist',
+      subHi: 'आवश्यक कागजात',
+      subPa: 'ਲੋੜੀਂਦੇ ਕਾਗਜ਼',
+      q: 'What documents do I need to apply?'
+    },
+    {
+      icon: <Calculator size={14} />,
+      bg: '#FFF1F2',
+      color: '#E11D48',
+      en: 'Calculate EMI',
+      hi: 'EMI कैलकुलेटर',
+      pa: 'EMI ਕੈਲਕੁਲੇਟਰ',
+      subEn: 'Repayment & interest',
+      subHi: 'मासिक किस्त जानें',
+      subPa: 'ਮਾਸਿਕ ਕਿਸ਼ਤ ਜਾਣੋ',
+      q: 'Calculate my EMI for a 4 lakh loan for 5 years at 7%'
+    },
+    {
+      icon: <TrendingUp size={14} />,
+      bg: '#F5F3FF',
+      color: '#7C3AED',
+      en: 'Project Report',
+      hi: 'प्रोजेक्ट रिपोर्ट',
+      pa: 'ਪ੍ਰੋਜੈਕਟ ਰਿਪੋਰਟ',
+      subEn: 'Draft bankable DPR',
+      subHi: 'DPR ड्राफ्ट बनाएं',
+      subPa: 'DPR ਤਿਆਰ ਕਰੋ',
+      q: "I don't have a project report, help me create one"
+    },
+    {
+      icon: <Building2 size={14} />,
+      bg: '#F8FAFC',
+      color: '#475569',
+      en: 'Where to Apply',
+      hi: 'कहाँ अप्लाई करें',
+      pa: 'ਕਿੱਥੇ ਅਪਲਾਈ',
+      subEn: 'Banks & nodal portals',
+      subHi: 'बैंक व ऑनलाइन पोर्टल',
+      subPa: 'ਬੈਂਕ ਅਤੇ ਪੋਰਟਲ',
+      q: 'Where should I apply for my loan?'
+    },
   ];
-  const label = lang === 'hi' ? 'आज मैं आपकी कैसे सहायता करूँ?' : lang === 'pa' ? 'ਅੱਜ ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰਾਂ?' : 'How can I help you today?';
+
+  const title = lang === 'hi' ? 'आज मैं आपकी क्या सहायता करूँ?' : lang === 'pa' ? 'ਅੱਜ ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰਾਂ?' : 'How can I help you today?';
+  const subtitle = lang === 'hi' ? 'त्वरित विकल्प चुनें या नीचे अपनी जरूरत लिखें:' : lang === 'pa' ? 'ਇੱਕ ਵਿਕਲਪ ਚੁਣੋ ਜਾਂ ਹੇਠਾਂ ਆਪਣੀ ਲੋੜ ਲਿਖੋ:' : 'Select a quick action or describe your situation:';
+
   return (
     <div className="si-quick-actions">
-      <div className="si-qa-title">{label}</div>
+      <div className="si-qa-header">
+        <div className="si-qa-badge-icon"><Sparkles size={14} /></div>
+        <div>
+          <h4 className="si-qa-title">{title}</h4>
+          <div className="si-qa-subtitle">{subtitle}</div>
+        </div>
+      </div>
       <div className="si-qa-grid">
         {actions.map((a, i) => (
           <button key={i} className="si-qa-btn" onClick={() => onAction(a.q)}>
-            <span className="si-qa-icon">{a.icon}</span>
-            <span className="si-qa-label">{lang === 'hi' ? a.hi : lang === 'pa' ? a.pa : a.en}</span>
+            <div className="si-qa-top-row">
+              <div className="si-qa-icon-wrap" style={{ background: a.bg, color: a.color }}>
+                {a.icon}
+              </div>
+              <ChevronRight size={13} className="si-qa-arrow" />
+            </div>
+            <div className="si-qa-label">{lang === 'hi' ? a.hi : lang === 'pa' ? a.pa : a.en}</div>
+            <div className="si-qa-sub">{lang === 'hi' ? a.subHi : lang === 'pa' ? a.subPa : a.subEn}</div>
           </button>
         ))}
       </div>
@@ -234,24 +316,41 @@ const QuickActionsPanel: React.FC<{ onAction: (q: string) => void; lang: ChatLan
 };
 
 const SchemeRecBubble: React.FC<{ results: SchemeMatchResult[]; onWhy: (r: SchemeMatchResult) => void; onWhere: (r: SchemeMatchResult) => void; }> = ({ results, onWhy, onWhere }) => {
-  const medals = ['🥇', '🥈', '🥉', '📋', '📋'];
-  const strengths = ['Strong Match', 'Potential Match', 'Potential Match', 'Conditional', 'Conditional'];
+  const medals = ['🥇', '🥈', '🥉', '⭐', '⭐'];
+  const rankLabels = ['Top Match', 'Strong', 'Potential', 'Conditional', 'Conditional'];
   return (
-    <div className="si-rec-container">
-      {results.slice(0, 5).map((r, i) => (
-        <div key={r.scheme.id} className={`si-rec-row ${i === 0 ? 'top' : ''}`}>
-          <div className="si-rec-medal">{medals[i]}</div>
-          <div className="si-rec-info">
-            <div className="si-rec-name">{r.scheme.name}</div>
-            <div className="si-rec-meta">{r.scheme.categoryTag} · <strong style={{ color: 'var(--si-nav-active)' }}>{r.matchScore}%</strong> · ₹{r.estimatedSubsidyAmount.toLocaleString('en-IN')} subsidy</div>
-            <div className="si-rec-tag">{strengths[i]}</div>
+    <div className="si-rec-card">
+      <div className="si-rec-header">
+        <Target size={14} className="si-rec-icon" />
+        <span className="si-rec-title">Recommended Schemes ({results.length})</span>
+      </div>
+      <div className="si-rec-list">
+        {results.slice(0, 5).map((r, i) => (
+          <div key={r.scheme.id} className={`si-rec-item ${i === 0 ? 'top-match' : ''}`}>
+            <div className="si-rec-medal-wrap">
+              <span className="si-rec-medal">{medals[i]}</span>
+              <span className="si-rec-rank-label">{rankLabels[i]}</span>
+            </div>
+            <div className="si-rec-content">
+              <div className="si-rec-name-row">
+                <span className="si-rec-name" title={r.scheme.name}>{r.scheme.name}</span>
+                <span className="si-rec-score-badge">{r.matchScore}% Match</span>
+              </div>
+              <div className="si-rec-details-row">
+                <span className="si-rec-category">{r.scheme.categoryTag}</span>
+                <span className="si-rec-dot">•</span>
+                <span className="si-rec-subsidy">₹{r.estimatedSubsidyAmount.toLocaleString('en-IN')} subsidy</span>
+              </div>
+            </div>
+            <div className="si-rec-actions">
+              <button className="si-rec-why-btn" onClick={() => onWhy(r)}>Why?</button>
+              <button className="si-rec-apply-btn" onClick={() => onWhere(r)}>
+                Apply <ChevronRight size={10} />
+              </button>
+            </div>
           </div>
-          <div className="si-rec-btns">
-            <button className="si-rec-why-btn" onClick={() => onWhy(r)} title="Why recommended?">Why?</button>
-            <button className="si-rec-where-btn" onClick={() => onWhere(r)} title="Where to apply?">Apply</button>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
@@ -259,21 +358,24 @@ const SchemeRecBubble: React.FC<{ results: SchemeMatchResult[]; onWhy: (r: Schem
 const WhyCard: React.FC<{ result: SchemeMatchResult; mode: 'eligible' | 'ineligible' }> = ({ result, mode }) => {
   const [open, setOpen] = useState(true);
   return (
-    <div className="si-why-card">
-      <div className="si-why-header" onClick={() => setOpen(o => !o)}>
-        <span>{mode === 'eligible' ? '✅ Why Recommended?' : '❌ Why Not Eligible?'}</span>
-        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+    <div className="si-intent-card">
+      <div className="si-intent-header" onClick={() => setOpen(o => !o)}>
+        <div className="si-intent-title">
+          {mode === 'eligible' ? <CheckCircle2 size={14} style={{ color: '#059669' }} /> : <XCircle size={14} style={{ color: '#E11D48' }} />}
+          <span>{mode === 'eligible' ? 'Why You Qualify for This Scheme' : 'Eligibility Gaps Identified'}</span>
+        </div>
+        <button className="si-card-toggle-btn">{open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}</button>
       </div>
       {open && (
         <div className="si-why-body">
           {result.reasonsWhyMatched.map((r, i) => (
-            <div key={i} className="si-why-row si-why-match"><Check size={12} /> {r}</div>
+            <div key={i} className="si-why-item match"><Check size={12} /> <span>{r}</span></div>
           ))}
           {result.conditionsToFulfill.map((c, i) => (
-            <div key={i} className="si-why-row si-why-cond"><AlertTriangle size={12} /> {c}</div>
+            <div key={i} className="si-why-item cond"><AlertTriangle size={12} /> <span>{c}</span></div>
           ))}
           {result.missingDocuments.map((d, i) => (
-            <div key={i} className="si-why-row si-why-miss"><XCircle size={12} /> {d}</div>
+            <div key={i} className="si-why-item miss"><XCircle size={12} /> <span>Missing: <strong>{d}</strong></span></div>
           ))}
         </div>
       )}
@@ -283,27 +385,29 @@ const WhyCard: React.FC<{ result: SchemeMatchResult; mode: 'eligible' | 'ineligi
 
 const GapCard: React.FC<{ result: SchemeMatchResult }> = ({ result: r }) => {
   const pct = r.matchScore;
-  const label = pct >= 80 ? '🟢 Strong Match' : pct >= 55 ? '🟡 Almost Eligible' : '🔴 Partial Match';
+  const label = pct >= 80 ? 'Strong Eligibility Match' : pct >= 55 ? 'Almost Eligible' : 'Partial Match';
   return (
-    <div className="si-gap-card">
-      <div className="si-gap-header">
-        <span className="si-gap-label">{label}</span>
-        <span className="si-gap-score">{pct}%</span>
+    <div className="si-intent-card" style={{ padding: '12px' }}>
+      <div className="si-gap-score-row">
+        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1E293B' }}>{label}</span>
+        <span className="si-gap-pct">{pct}%</span>
       </div>
-      <div className="si-gap-bar"><div className="si-gap-fill" style={{ width: `${pct}%` }} /></div>
-      <div className="si-gap-rows">
+      <div className="si-gap-bar-bg"><div className="si-gap-bar-fill" style={{ width: `${pct}%` }} /></div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
         {r.reasonsWhyMatched.slice(0, 3).map((m, i) => (
-          <div key={i} className="si-gap-row si-gap-ok"><Check size={11} /> {m}</div>
+          <div key={i} className="si-why-item match"><Check size={11} /> <span>{m}</span></div>
         ))}
         {r.missingDocuments.slice(0, 2).map((d, i) => (
-          <div key={i} className="si-gap-row si-gap-no"><XCircle size={11} /> Missing: {d}</div>
+          <div key={i} className="si-why-item miss"><XCircle size={11} /> <span>Need document: <strong>{d}</strong></span></div>
         ))}
         {r.conditionsToFulfill.slice(0, 2).map((c, i) => (
-          <div key={i} className="si-gap-row si-gap-warn"><AlertTriangle size={11} /> {c}</div>
+          <div key={i} className="si-why-item cond"><AlertTriangle size={11} /> <span>{c}</span></div>
         ))}
       </div>
       {(r.missingDocuments.length > 0 || r.conditionsToFulfill.length > 0) && (
-        <div className="si-gap-next">Next Step: Complete missing requirements and re-check eligibility.</div>
+        <div style={{ marginTop: '8px', padding: '6px 8px', background: 'rgba(255,111,0,0.08)', borderRadius: '6px', fontSize: '0.71rem', color: '#EA580C', fontWeight: 600 }}>
+          Next Step: Complete missing documents to reach 100% eligibility.
+        </div>
       )}
     </div>
   );
@@ -317,31 +421,74 @@ const EMICard: React.FC<{
   const total = emi * tenureYears * 12;
   const interest = total - principal;
   const [editingAmt, setEditingAmt] = useState('');
-  const [editingTenure, setEditingTenure] = useState('');
+
   return (
-    <div className="si-emi-card">
-      <div className="si-emi-title">💰 EMI Calculation</div>
-      <div className="si-emi-rows">
-        <div className="si-emi-row"><span>Loan Amount</span><strong>₹{principal.toLocaleString('en-IN')}</strong></div>
-        <div className="si-emi-row"><span>Interest Rate</span><strong>{rate}% p.a.</strong></div>
-        <div className="si-emi-row"><span>Tenure</span><strong>{tenureYears} yrs ({tenureYears * 12} months)</strong></div>
-        <div className="si-emi-divider" />
-        <div className="si-emi-row si-emi-highlight"><span>Monthly EMI</span><span className="si-emi-big">₹{emi.toLocaleString('en-IN')}</span></div>
-        <div className="si-emi-row"><span>Total Interest</span><span>₹{interest.toLocaleString('en-IN')}</span></div>
-        <div className="si-emi-row"><span>Total Payable</span><span>₹{total.toLocaleString('en-IN')}</span></div>
-      </div>
-      <div className="si-emi-modify">
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flex: 1 }}>
-          <input className="si-emi-input" placeholder="New amount" value={editingAmt}
-            onChange={e => setEditingAmt(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && editingAmt) { onModify('principal', extractAmount(editingAmt) || parseInt(editingAmt)); setEditingAmt(''); } }} />
-          <button className="si-emi-mod-btn" onClick={() => { if (editingAmt) { onModify('principal', extractAmount(editingAmt) || parseInt(editingAmt)); setEditingAmt(''); } }}>Change Amount</button>
+    <div className="si-intent-card">
+      <div className="si-intent-header static">
+        <div className="si-intent-title">
+          <Calculator size={14} style={{ color: '#FF6F00' }} />
+          <span>EMI & Repayment Breakdown</span>
         </div>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flex: 1 }}>
-          <input className="si-emi-input" placeholder="New tenure (yrs)" value={editingTenure}
-            onChange={e => setEditingTenure(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && editingTenure) { onModify('tenure', parseInt(editingTenure)); setEditingTenure(''); } }} />
-          <button className="si-emi-mod-btn" onClick={() => { if (editingTenure) { onModify('tenure', parseInt(editingTenure)); setEditingTenure(''); } }}>Change Tenure</button>
+        <span className="si-tag-pill saffron">{tenureYears} Years</span>
+      </div>
+      <div className="si-emi-focal">
+        <div className="si-emi-focal-label">Estimated Monthly EMI</div>
+        <div className="si-emi-focal-value">₹{emi.toLocaleString('en-IN')}<span>/mo</span></div>
+      </div>
+      <div className="si-emi-grid">
+        <div className="si-emi-grid-item">
+          <span className="si-emi-lbl">Loan Principal</span>
+          <span className="si-emi-val">₹{principal.toLocaleString('en-IN')}</span>
+        </div>
+        <div className="si-emi-grid-item">
+          <span className="si-emi-lbl">Interest Rate</span>
+          <span className="si-emi-val">{rate}% p.a.</span>
+        </div>
+        <div className="si-emi-grid-item">
+          <span className="si-emi-lbl">Total Interest</span>
+          <span className="si-emi-val">₹{interest.toLocaleString('en-IN')}</span>
+        </div>
+        <div className="si-emi-grid-item">
+          <span className="si-emi-lbl">Total Payable</span>
+          <span className="si-emi-val">₹{total.toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+      <div className="si-emi-actions">
+        <div className="si-emi-input-group">
+          <input
+            className="si-emi-input"
+            placeholder="Change loan amount..."
+            value={editingAmt}
+            onChange={e => setEditingAmt(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && editingAmt) {
+                const amt = extractAmount(editingAmt) || parseInt(editingAmt);
+                if (amt > 0) { onModify('principal', amt); setEditingAmt(''); }
+              }
+            }}
+          />
+          <button
+            className="si-emi-apply-btn"
+            onClick={() => {
+              if (editingAmt) {
+                const amt = extractAmount(editingAmt) || parseInt(editingAmt);
+                if (amt > 0) { onModify('principal', amt); setEditingAmt(''); }
+              }
+            }}
+          >
+            Update
+          </button>
+        </div>
+        <div className="si-emi-quick-chips">
+          {[3, 5, 7].map(yrs => (
+            <button
+              key={yrs}
+              className={`si-emi-chip ${tenureYears === yrs ? 'active' : ''}`}
+              onClick={() => onModify('tenure', yrs)}
+            >
+              {yrs} Years
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -352,22 +499,24 @@ const WhatIfCard: React.FC<{ field: string; before: any; after: any; beforeCount
   const improved = afterCount > beforeCount;
   const fmtVal = (v: any) => typeof v === 'number' && v > 10000 ? `₹${v.toLocaleString('en-IN')}` : String(v);
   return (
-    <div className="si-whatif-card">
-      <div className="si-whatif-title">🔄 What-If Analysis: {field}</div>
-      <div className="si-whatif-compare">
-        <div className="si-whatif-col">
-          <div className="si-whatif-col-label">Current</div>
-          <div className="si-whatif-val">{fmtVal(before)}</div>
-          <div className="si-whatif-count">{beforeCount} schemes</div>
+    <div className="si-intent-card" style={{ padding: '12px' }}>
+      <div style={{ fontWeight: 800, color: '#1E293B', fontSize: '0.8rem', marginBottom: '10px' }}>
+        🔄 What-If Scenario: {field}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '8px' }}>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Current</div>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1E293B' }}>{fmtVal(before)}</div>
+          <div style={{ fontSize: '0.7rem', color: '#64748B' }}>{beforeCount} schemes</div>
         </div>
-        <div className="si-whatif-arrow">{improved ? '📈' : '📉'}</div>
-        <div className="si-whatif-col">
-          <div className="si-whatif-col-label">New Scenario</div>
-          <div className="si-whatif-val" style={{ color: improved ? 'var(--si-success)' : '#E11D48' }}>{fmtVal(after)}</div>
-          <div className="si-whatif-count" style={{ color: improved ? 'var(--si-success)' : '#E11D48' }}>{afterCount} schemes</div>
+        <div style={{ fontSize: '1.4rem' }}>{improved ? '📈' : '📉'}</div>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>New Scenario</div>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: improved ? '#059669' : '#E11D48' }}>{fmtVal(after)}</div>
+          <div style={{ fontSize: '0.7rem', color: improved ? '#059669' : '#E11D48' }}>{afterCount} schemes</div>
         </div>
       </div>
-      <div className="si-whatif-note">
+      <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#64748B', textAlign: 'center', padding: '5px 8px', background: '#F8FAFC', borderRadius: '6px' }}>
         {improved
           ? `✅ ${afterCount - beforeCount} more schemes match with this change.`
           : `⚠️ ${beforeCount - afterCount} fewer schemes match. Consider adjusting your requirements.`}
@@ -377,34 +526,39 @@ const WhatIfCard: React.FC<{ field: string; before: any; after: any; beforeCount
 };
 
 const DocChecklistCard: React.FC<{ schemeName: string; docs: Array<{ name: string; have: boolean }>; score: number }> = ({ schemeName, docs, score }) => (
-  <div className="si-doc-card">
-    <div className="si-doc-title">📋 {schemeName} — Document Checklist</div>
+  <div className="si-intent-card">
+    <div className="si-intent-header static">
+      <div className="si-intent-title">
+        <FileText size={14} style={{ color: '#4F46E5' }} />
+        <span>Document Readiness</span>
+      </div>
+      <span className={`si-tag-pill ${score >= 80 ? 'green' : 'amber'}`}>{score}% Ready</span>
+    </div>
+    <div className="si-doc-scheme-name">{schemeName}</div>
+    <div className="si-doc-progress-wrap">
+      <div className="si-doc-bar-bg"><div className="si-doc-bar-fill" style={{ width: `${score}%` }} /></div>
+    </div>
     <div className="si-doc-list">
       {docs.map((d, i) => (
-        <div key={i} className={`si-doc-item ${d.have ? 'have' : 'miss'}`}>
-          {d.have ? <Check size={12} /> : <XCircle size={12} />}
-          <span>{d.name}</span>
-          {!d.have && <span className="si-doc-badge">Missing</span>}
+        <div key={i} className={`si-doc-row ${d.have ? 'ready' : 'missing'}`}>
+          {d.have ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
+          <span className="si-doc-name">{d.name}</span>
+          <span className="si-doc-status-badge">{d.have ? 'Ready' : 'Missing'}</span>
         </div>
       ))}
     </div>
-    <div className="si-doc-progress-label">Application Readiness: <strong>{score}%</strong></div>
-    <div className="si-doc-bar-bg"><div className="si-doc-bar-fill" style={{ width: `${score}%` }} /></div>
-    {score < 100 && (
-      <div className="si-doc-tip">💡 Ask me "Where can I get a project report?" or "How do I get a caste certificate?"</div>
-    )}
   </div>
 );
 
 const FraudCard: React.FC<{ url: string }> = ({ url }) => (
   <div className="si-fraud-card">
-    <div className="si-fraud-title"><AlertTriangle size={15} /> ⚠️ Verification Warning</div>
+    <div className="si-fraud-title"><AlertTriangle size={15} /> ⚠️ Source Verification Warning</div>
     <div className="si-fraud-url">{url}</div>
-    <div className="si-fraud-msg">I could not verify this as an official government application source.</div>
-    <div className="si-fraud-tips">
-      <div className="si-fraud-tip"><CheckCircle2 size={11} /> Always use portals ending in .gov.in or .nic.in</div>
-      <div className="si-fraud-tip"><CheckCircle2 size={11} /> Never share OTP, PIN, or bank passwords</div>
-      <div className="si-fraud-tip"><CheckCircle2 size={11} /> Verify with official helpline before any payment</div>
+    <div style={{ fontSize: '0.74rem', color: '#1E293B', marginBottom: '8px' }}>I could not verify this as an official government application portal.</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.71rem', color: '#1E293B' }}><CheckCircle2 size={11} style={{ color: '#059669' }} /> Always use portals ending in .gov.in or .nic.in</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.71rem', color: '#1E293B' }}><CheckCircle2 size={11} style={{ color: '#059669' }} /> Never share OTP, PIN, or bank passwords</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.71rem', color: '#1E293B' }}><CheckCircle2 size={11} style={{ color: '#059669' }} /> Verify with official helpline before any payment</div>
     </div>
   </div>
 );
@@ -417,38 +571,50 @@ const LiteracyCard: React.FC<{ term: string; expl: { en: string; hi: string }; l
 );
 
 const WhereCard: React.FC<{ result: SchemeMatchResult }> = ({ r: result }: any) => (
-  <div className="si-where-card">
-    <div className="si-where-title">🏦 Where to Apply</div>
-    <div className="si-where-agency">{(result as SchemeMatchResult).scheme.nodalAgency}</div>
-    <div className="si-where-mode">Mode: {(result as SchemeMatchResult).scheme.applicationMode}</div>
-    <div className="si-where-rows">
-      <div className="si-where-row"><CheckCircle2 size={11} /> Authorized for {(result as SchemeMatchResult).scheme.name}</div>
-      <div className="si-where-row"><CheckCircle2 size={11} /> Processing: ~{(result as SchemeMatchResult).scheme.averageProcessingDays} days</div>
-      <div className="si-where-row"><CheckCircle2 size={11} /> Collateral: {(result as SchemeMatchResult).scheme.collateralRequirement}</div>
+  <div className="si-intent-card">
+    <div className="si-intent-header static">
+      <div className="si-intent-title">
+        <Building2 size={14} style={{ color: '#FF6F00' }} />
+        <span>Where to Apply</span>
+      </div>
+      <span className="si-tag-pill saffron">Authorized</span>
+    </div>
+    <div className="si-where-agency-name">{(result as SchemeMatchResult).scheme.nodalAgency}</div>
+    <div className="si-where-badges">
+      <span className="si-where-chip">Mode: {(result as SchemeMatchResult).scheme.applicationMode}</span>
+      <span className="si-where-chip">Processing: ~{(result as SchemeMatchResult).scheme.averageProcessingDays} days</span>
+    </div>
+    <div className="si-where-collateral">
+      <strong>Collateral:</strong> {(result as SchemeMatchResult).scheme.collateralRequirement}
     </div>
     {(result as SchemeMatchResult).scheme.officialPortalUrl && (
-      <a href={(result as SchemeMatchResult).scheme.officialPortalUrl} target="_blank" rel="noopener noreferrer" className="si-where-portal">
-        <ExternalLink size={12} /> Official Portal <ExternalLink size={10} />
+      <a href={(result as SchemeMatchResult).scheme.officialPortalUrl} target="_blank" rel="noopener noreferrer" className="si-where-launch-btn">
+        <span>Open Official Portal</span>
+        <ExternalLink size={12} />
       </a>
     )}
   </div>
 );
 
 const DPRDraftCard: React.FC<{ dpr: any; businessName: string }> = ({ dpr, businessName }) => (
-  <div className="si-dpr-card">
-    <div className="si-dpr-warning">⚠️ AI-generated draft — review and verify before submission</div>
-    <div className="si-dpr-title">📄 Draft Project Report: {businessName}</div>
+  <div className="si-intent-card" style={{ padding: '12px' }}>
+    <div style={{ fontSize: '0.68rem', color: '#D97706', background: '#FFFBEB', padding: '4px 8px', borderRadius: '6px', marginBottom: '8px', fontWeight: 600 }}>
+      ⚠️ AI-generated draft — review and verify before bank submission
+    </div>
+    <div style={{ fontWeight: 800, color: '#1E293B', fontSize: '0.82rem', marginBottom: '8px' }}>
+      📄 Draft Project Report: {businessName}
+    </div>
     {dpr?.model && (
-      <div className="si-dpr-rows">
-        <div className="si-dpr-row"><span>Total Project Cost</span><strong>₹{dpr.model.summary.totalProjectCost?.toLocaleString('en-IN')}</strong></div>
-        <div className="si-dpr-row"><span>Bank Loan Required</span><strong>₹{dpr.model.summary.totalBankLoan?.toLocaleString('en-IN')}</strong></div>
-        <div className="si-dpr-row"><span>Promoter Margin</span><strong>₹{dpr.model.summary.promoterContribution?.toLocaleString('en-IN')} ({dpr.model.summary.promoterContributionPercent}%)</strong></div>
-        <div className="si-dpr-row"><span>Subsidy Eligible</span><strong style={{ color: 'var(--si-success)' }}>₹{dpr.model.summary.subsidyEligible?.toLocaleString('en-IN')} ({dpr.model.summary.subsidyPercent}%)</strong></div>
-        <div className="si-dpr-row"><span>Monthly EMI</span><strong>₹{dpr.model.repaymentSchedule.monthlyEmi?.toLocaleString('en-IN')}</strong></div>
-        <div className="si-dpr-row"><span>Bank Viability</span><strong style={{ color: dpr.model.viabilityMetrics.bankViabilityVerdict === 'Highly Bankable' ? 'var(--si-success)' : 'var(--si-nav-active)' }}>{dpr.model.viabilityMetrics.bankViabilityVerdict}</strong></div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '0.74rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Total Project Cost</span><strong>₹{dpr.model.summary.totalProjectCost?.toLocaleString('en-IN')}</strong></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Bank Loan Required</span><strong>₹{dpr.model.summary.totalBankLoan?.toLocaleString('en-IN')}</strong></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Promoter Margin</span><strong>₹{dpr.model.summary.promoterContribution?.toLocaleString('en-IN')} ({dpr.model.summary.promoterContributionPercent}%)</strong></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Subsidy Eligible</span><strong style={{ color: '#059669' }}>₹{dpr.model.summary.subsidyEligible?.toLocaleString('en-IN')} ({dpr.model.summary.subsidyPercent}%)</strong></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Monthly EMI</span><strong>₹{dpr.model.repaymentSchedule.monthlyEmi?.toLocaleString('en-IN')}</strong></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#64748B' }}>Bank Viability</span><strong style={{ color: dpr.model.viabilityMetrics.bankViabilityVerdict === 'Highly Bankable' ? '#059669' : '#FF6F00' }}>{dpr.model.viabilityMetrics.bankViabilityVerdict}</strong></div>
       </div>
     )}
-    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '8px' }}>Take this to your nearest KVIC / PSB branch for formal appraisal.</div>
+    <div style={{ fontSize: '0.7rem', color: '#64748B', marginTop: '8px' }}>Take this draft to your nearest KVIC / PSB branch for formal appraisal.</div>
   </div>
 );
 
@@ -925,145 +1091,215 @@ export const SaathiPanel: React.FC<{ collapsed: boolean; onToggle: () => void }>
       {/* ── Panel Header ── */}
       <div className="si-saathi-panel-header">
         <div className="si-saathi-panel-title">
-          <div className="si-saathi-panel-avatar"><Sparkles size={14} /></div>
-          <div>
-            <div className="si-saathi-panel-name">Saathi AI</div>
-            <div className="si-saathi-panel-sub">AI Scheme Assistant</div>
+          <div className="si-saathi-avatar-wrap">
+            <div className="si-saathi-panel-avatar">
+              <Sparkles size={16} />
+            </div>
+            <span className="si-saathi-status-dot" title="Saathi Copilot Active" />
+          </div>
+          <div className="si-saathi-header-info">
+            <div className="si-saathi-title-row">
+              <span className="si-saathi-panel-name">Saathi AI</span>
+              <span className="si-saathi-badge">Copilot</span>
+            </div>
+            <div className="si-saathi-panel-sub">
+              <span className="si-status-text">Online</span> • 100+ Schemes
+            </div>
           </div>
         </div>
-        {/* Language Switcher */}
-        <div className="si-saathi-lang-row">
+
+        {/* Language Switcher Segmented */}
+        <div className="si-saathi-lang-segmented">
           {(['en', 'hi', 'pa'] as ChatLang[]).map(l => (
-            <button key={l} className={`si-lang-chip ${lang === l ? 'active' : ''}`} onClick={() => setLang(l)}>
+            <button
+              key={l}
+              className={`si-lang-pill ${lang === l ? 'active' : ''}`}
+              onClick={() => setLang(l)}
+              title={l === 'en' ? 'English' : l === 'hi' ? 'हिंदी' : 'ਪੰਜਾਬੀ'}
+            >
               {l === 'en' ? 'EN' : l === 'hi' ? 'हि' : 'ਪੰ'}
             </button>
           ))}
         </div>
-        <button className="si-saathi-toggle-btn" onClick={onToggle}><ChevronRight size={16} /></button>
+
+        {/* Header Actions */}
+        <div className="si-saathi-header-actions">
+          <button
+            className="si-saathi-header-icon-btn"
+            onClick={() => setMessages([WELCOME_MSG])}
+            title="Reset Conversation"
+          >
+            <RotateCcw size={13} />
+          </button>
+          <button
+            className="si-saathi-header-icon-btn"
+            onClick={onToggle}
+            title="Collapse Assistant"
+          >
+            <ChevronRight size={15} />
+          </button>
+        </div>
       </div>
 
       {/* ── Messages Body ── */}
       <div className="si-saathi-panel-body">
 
-        {/* Quick Actions when empty */}
+        {/* Quick Actions when only welcome message */}
         {showQuickActions && <QuickActionsPanel onAction={q => sendMessage(q)} lang={lang} />}
 
         {messages.map(msg => (
-          <div key={msg.id}>
-            {/* Chat Bubble */}
-            <div className={`si-chat-bubble ${msg.sender}`} style={{ alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}>
-              {msg.sender === 'assistant' && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <span className="si-chat-sender">Saathi AI</span>
-                  <button onClick={() => speakText(lang === 'hi' && msg.hindiText ? msg.hindiText : msg.text)}
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}>
-                    <Volume2 size={11} />
-                  </button>
+          <div key={msg.id} className="si-message-item">
+            {msg.sender === 'assistant' ? (
+              <div className="si-assistant-row">
+                <div className="si-msg-avatar">
+                  <Sparkles size={13} />
                 </div>
-              )}
-              <div style={{ whiteSpace: 'pre-line', fontSize: '0.82rem' }}>
-                {lang === 'hi' && msg.hindiText ? msg.hindiText : msg.text}
+                <div className="si-msg-bubble-wrap">
+                  {/* Chat Bubble */}
+                  <div className="si-chat-bubble assistant">
+                    <div className="si-chat-bubble-header">
+                      <span className="si-chat-sender">Saathi AI</span>
+                      <span className="si-ai-tag">Verified</span>
+                      <div className="si-bubble-actions">
+                        <button
+                          className="si-bubble-action-btn"
+                          onClick={() => speakText(lang === 'hi' && msg.hindiText ? msg.hindiText : msg.text)}
+                          title="Read Aloud"
+                        >
+                          <Volume2 size={12} />
+                        </button>
+                        <span className="si-chat-time">{msg.timestamp}</span>
+                      </div>
+                    </div>
+                    <div className="si-chat-text">
+                      {lang === 'hi' && msg.hindiText ? msg.hindiText : msg.text}
+                    </div>
+                  </div>
+
+                  {/* Intent-specific Rich Cards under assistant message */}
+                  {msg.schemeResults && msg.schemeResults.length > 0 && (
+                    <SchemeRecBubble results={msg.schemeResults} onWhy={r => handleWhy(r, 'eligible')} onWhere={handleWhere} />
+                  )}
+
+                  {msg.selectedForWhy && (msg.intent === 'why_scheme' || msg.intent === 'why_not' || msg.intent === 'gap_analyze') && (
+                    <>
+                      <WhyCard result={msg.selectedForWhy} mode={msg.intent === 'why_not' ? 'ineligible' : 'eligible'} />
+                      {msg.intent === 'gap_analyze' && <GapCard result={msg.selectedForWhy} />}
+                    </>
+                  )}
+
+                  {msg.emiData && msg.intent === 'check_emi' && (
+                    <EMICard {...msg.emiData} onModify={handleEMIModify} />
+                  )}
+
+                  {msg.whatIfData && msg.intent === 'what_if' && (
+                    <WhatIfCard {...msg.whatIfData} />
+                  )}
+
+                  {msg.docData && <DocChecklistCard {...msg.docData} />}
+
+                  {msg.fraudUrl && <FraudCard url={msg.fraudUrl} />}
+
+                  {msg.litTerm && FINANCIAL_TERMS[msg.litTerm] && (
+                    <LiteracyCard term={msg.litTerm} expl={FINANCIAL_TERMS[msg.litTerm]} lang={lang} />
+                  )}
+
+                  {msg.whereData && <WhereCard r={msg.whereData} />}
+
+                  {msg.dprResult && <DPRDraftCard dpr={msg.dprResult} businessName={dprData.businessName || 'Your Business'} />}
+
+                  {/* Suggested Prompts */}
+                  {msg.suggestedPrompts && msg.suggestedPrompts.length > 0 && (
+                    <div className="si-suggested-prompts">
+                      {msg.suggestedPrompts.map((p, i) => (
+                        <button key={i} className="si-prompt-chip" onClick={() => sendMessage(p)}>
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="si-chat-time">{msg.timestamp}</div>
-            </div>
-
-            {/* ── Intent-specific Rich Cards ── */}
-
-            {/* Scheme Recommendations */}
-            {msg.schemeResults && msg.schemeResults.length > 0 && (
-              <SchemeRecBubble results={msg.schemeResults} onWhy={r => handleWhy(r, 'eligible')} onWhere={handleWhere} />
-            )}
-
-            {/* Why Card */}
-            {msg.selectedForWhy && (msg.intent === 'why_scheme' || msg.intent === 'why_not' || msg.intent === 'gap_analyze') && (
-              <>
-                <WhyCard result={msg.selectedForWhy} mode={msg.intent === 'why_not' ? 'ineligible' : 'eligible'} />
-                {msg.intent === 'gap_analyze' && <GapCard result={msg.selectedForWhy} />}
-              </>
-            )}
-
-            {/* EMI Card */}
-            {msg.emiData && msg.intent === 'check_emi' && (
-              <EMICard {...msg.emiData} onModify={handleEMIModify} />
-            )}
-
-            {/* What-If Card */}
-            {msg.whatIfData && msg.intent === 'what_if' && (
-              <WhatIfCard {...msg.whatIfData} />
-            )}
-
-            {/* Document Checklist */}
-            {msg.docData && <DocChecklistCard {...msg.docData} />}
-
-            {/* Fraud Warning */}
-            {msg.fraudUrl && <FraudCard url={msg.fraudUrl} />}
-
-            {/* Financial Literacy */}
-            {msg.litTerm && FINANCIAL_TERMS[msg.litTerm] && (
-              <LiteracyCard term={msg.litTerm} expl={FINANCIAL_TERMS[msg.litTerm]} lang={lang} />
-            )}
-
-            {/* Where to Apply */}
-            {msg.whereData && <WhereCard r={msg.whereData} />}
-
-            {/* DPR Draft */}
-            {msg.dprResult && <DPRDraftCard dpr={msg.dprResult} businessName={dprData.businessName || 'Your Business'} />}
-
-            {/* Suggested Prompts */}
-            {msg.suggestedPrompts && msg.suggestedPrompts.length > 0 && (
-              <div className="si-suggested-prompts">
-                {msg.suggestedPrompts.map((p, i) => (
-                  <button key={i} className="si-prompt-chip" onClick={() => sendMessage(p)}>{p}</button>
-                ))}
+            ) : (
+              <div className="si-user-row">
+                <div className="si-chat-bubble user">
+                  <div className="si-chat-text">{msg.text}</div>
+                  <div className="si-chat-time">{msg.timestamp}</div>
+                </div>
               </div>
             )}
           </div>
         ))}
 
-        {/* Loading indicator */}
+        {/* Typing indicator */}
         {isLoading && (
-          <div className="si-chat-bubble assistant" style={{ fontStyle: 'italic', fontSize: '0.78rem' }}>
-            <span className="si-typing-dot" />
-            <span className="si-typing-dot" style={{ animationDelay: '0.2s' }} />
-            <span className="si-typing-dot" style={{ animationDelay: '0.4s' }} />
+          <div className="si-assistant-row">
+            <div className="si-msg-avatar">
+              <Sparkles size={13} />
+            </div>
+            <div className="si-chat-bubble assistant typing">
+              <div className="si-typing-indicator">
+                <span className="si-typing-dot" />
+                <span className="si-typing-dot" />
+                <span className="si-typing-dot" />
+              </div>
+              <span className="si-typing-text">Finding eligible schemes...</span>
+            </div>
           </div>
         )}
         <div ref={endRef} />
       </div>
 
-      {/* ── Panel Footer ── */}
+      {/* ── Panel Footer & Input Dock ── */}
       <div className="si-saathi-panel-footer">
-        {/* File Upload */}
-        <label className="si-saathi-upload-btn" title="Upload Document">
-          <Upload size={14} />
-          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onChange={handleFileUpload} style={{ display: 'none' }} />
-        </label>
+        <div className="si-saathi-dock-capsule">
+          <div className="si-dock-tools">
+            {/* File Upload */}
+            <label className="si-dock-icon-btn" title="Upload Document or Certificate">
+              <Upload size={14} />
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onChange={handleFileUpload} style={{ display: 'none' }} />
+            </label>
 
-        {/* Voice */}
-        <button className={`si-saathi-mic-btn ${isRecording ? 'recording' : ''}`} onClick={toggleVoice} title="Voice Input">
-          {isRecording ? <MicOff size={15} /> : <Mic size={15} />}
-        </button>
+            {/* Voice Mic */}
+            <button
+              className={`si-dock-icon-btn ${isRecording ? 'recording' : ''}`}
+              onClick={toggleVoice}
+              title={isRecording ? 'Listening... click to stop' : 'Speak your query in EN/HI/PA'}
+            >
+              {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
+            </button>
+          </div>
 
-        {/* Text input */}
-        <input
-          className="si-saathi-input"
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-          placeholder={
-            dprStep ? '📄 Enter details for project report...'
-              : isRecording ? '🎙️ Listening...'
-                : lang === 'hi' ? 'अपना सवाल पूछें...'
-                  : lang === 'pa' ? 'ਆਪਣਾ ਸਵਾਲ ਪੁੱਛੋ...'
-                    : 'Ask about schemes, EMI, eligibility...'
-          }
-        />
+          {/* Text Input */}
+          <input
+            className="si-saathi-input"
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+            placeholder={
+              dprStep ? '📄 Enter business details for report...'
+                : isRecording ? '🎙️ Listening... speak now'
+                  : lang === 'hi' ? 'अपनी जरूरत बताएं (लोन, सब्सिडी, EMI)...'
+                    : lang === 'pa' ? 'ਆਪਣੀ ਲੋੜ ਦੱਸੋ (ਕਰਜ਼ਾ, ਸਬਸਿਡੀ, EMI)...'
+                      : 'Ask about schemes, loans, EMI, docs...'
+            }
+          />
 
-        {/* Send */}
-        <button className="si-saathi-send-btn" onClick={() => sendMessage()} disabled={isLoading}>
-          <Send size={15} />
-        </button>
+          {/* Send Button */}
+          <button
+            className="si-saathi-send-btn"
+            onClick={() => sendMessage()}
+            disabled={isLoading || (!input.trim() && !isRecording)}
+            title="Send Message"
+          >
+            <Send size={14} />
+          </button>
+        </div>
+
+        <div className="si-saathi-dock-footnote">
+          <span>⚡ Rules-based AI Scheme Matcher • Multilingual</span>
+        </div>
       </div>
     </div>
   );
