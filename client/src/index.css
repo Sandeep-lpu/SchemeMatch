@@ -7945,3 +7945,306 @@ body.lang-transition-active {
   .si-top-bar { padding: 0 14px; }
 }
 
+/* ==========================================================================
+   SAATHI AI PANEL — Full AI Scheme Assistant
+   ========================================================================== */
+
+/* ── Panel Shell ─────────────────────────────────────────────────────────── */
+.si-saathi-panel {
+  display: flex; flex-direction: column;
+  width: 360px; height: 100%;
+  background: var(--si-bg); border-left: 1px solid var(--si-border);
+  font-family: 'Inter', sans-serif; position: relative;
+  transition: width 0.25s ease;
+}
+.si-saathi-panel.collapsed { width: 48px; overflow: hidden; }
+
+.si-saathi-panel-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; border-bottom: 1px solid var(--si-border);
+  background: var(--si-surface); flex-shrink: 0;
+}
+.si-saathi-panel-title { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.si-saathi-panel-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--si-nav-active), var(--si-indigo));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; flex-shrink: 0;
+}
+.si-saathi-panel-name { font-size: 0.82rem; font-weight: 700; color: var(--si-text); }
+.si-saathi-panel-sub { font-size: 0.68rem; color: var(--si-muted); }
+.si-saathi-toggle-btn {
+  background: transparent; border: 1px solid var(--si-border); border-radius: 8px;
+  color: var(--si-muted); cursor: pointer; padding: 4px 6px; flex-shrink: 0;
+  display: flex; align-items: center;
+}
+.si-saathi-toggle-btn:hover { color: var(--si-nav-active); border-color: var(--si-nav-active); }
+
+/* ── Lang Row ─────────────────────────────────────────────────────────────── */
+.si-saathi-lang-row { display: flex; gap: 4px; }
+.si-lang-chip {
+  padding: 2px 7px; border-radius: 20px; font-size: 0.68rem; font-weight: 600;
+  border: 1px solid var(--si-border); background: transparent; color: var(--si-muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.si-lang-chip.active, .si-lang-chip:hover {
+  background: var(--si-nav-active); border-color: var(--si-nav-active); color: #fff;
+}
+
+/* ── Messages Body ───────────────────────────────────────────────────────── */
+.si-saathi-panel-body {
+  flex: 1; overflow-y: auto; padding: 14px; display: flex;
+  flex-direction: column; gap: 10px;
+  scrollbar-width: thin; scrollbar-color: var(--si-border) transparent;
+}
+.si-saathi-panel-body::-webkit-scrollbar { width: 4px; }
+.si-saathi-panel-body::-webkit-scrollbar-thumb { background: var(--si-border); border-radius: 4px; }
+
+/* ── Chat Bubbles ────────────────────────────────────────────────────────── */
+.si-chat-bubble {
+  max-width: 90%; padding: 9px 12px; border-radius: 14px;
+  font-size: 0.82rem; line-height: 1.5; word-break: break-word;
+}
+.si-chat-bubble.assistant {
+  background: var(--si-surface); color: var(--si-text);
+  border: 1px solid var(--si-border); border-radius: 4px 14px 14px 14px;
+  align-self: flex-start;
+}
+.si-chat-bubble.user {
+  background: var(--si-nav-active); color: #fff;
+  border-radius: 14px 4px 14px 14px; align-self: flex-end;
+}
+.si-chat-sender { font-size: 0.68rem; font-weight: 700; color: var(--si-nav-active); }
+.si-chat-time { font-size: 0.65rem; color: var(--si-muted); margin-top: 4px; text-align: right; }
+
+/* ── Typing Indicator ────────────────────────────────────────────────────── */
+.si-typing-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--si-nav-active); margin: 0 2px;
+  animation: si-bounce 1.2s infinite;
+}
+@keyframes si-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.si-saathi-panel-footer {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 12px; border-top: 1px solid var(--si-border);
+  background: var(--si-surface); flex-shrink: 0;
+}
+.si-saathi-input {
+  flex: 1; background: var(--si-bg); border: 1px solid var(--si-border);
+  border-radius: 24px; padding: 7px 13px; font-size: 0.8rem; color: var(--si-text);
+  outline: none; transition: border-color 0.2s;
+}
+.si-saathi-input:focus { border-color: var(--si-nav-active); }
+.si-saathi-send-btn, .si-saathi-mic-btn, .si-saathi-upload-btn {
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; border: none; cursor: pointer; flex-shrink: 0;
+  transition: all 0.18s;
+}
+.si-saathi-send-btn { background: var(--si-nav-active); color: #fff; }
+.si-saathi-send-btn:hover { background: var(--si-indigo); transform: scale(1.06); }
+.si-saathi-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.si-saathi-mic-btn { background: var(--si-surface); color: var(--si-muted); border: 1px solid var(--si-border); }
+.si-saathi-mic-btn.recording { background: #E11D48; color: #fff; border-color: #E11D48; animation: si-pulse 1s infinite; }
+.si-saathi-upload-btn { background: var(--si-surface); color: var(--si-muted); border: 1px solid var(--si-border); cursor: pointer; }
+.si-saathi-upload-btn:hover { border-color: var(--si-nav-active); color: var(--si-nav-active); }
+@keyframes si-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0.4); } 50% { box-shadow: 0 0 0 8px rgba(225,29,72,0); } }
+
+/* ── Quick Actions ───────────────────────────────────────────────────────── */
+.si-quick-actions {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 14px; padding: 14px; margin-bottom: 4px;
+}
+.si-qa-title { font-size: 0.78rem; font-weight: 600; color: var(--si-text); margin-bottom: 10px; }
+.si-qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.si-qa-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 10px; border-radius: 10px; border: 1px solid var(--si-border);
+  background: var(--si-bg); cursor: pointer; transition: all 0.18s; text-align: left;
+}
+.si-qa-btn:hover { border-color: var(--si-nav-active); background: rgba(255,111,0,0.06); transform: translateY(-1px); }
+.si-qa-icon { font-size: 1rem; flex-shrink: 0; }
+.si-qa-label { font-size: 0.73rem; font-weight: 600; color: var(--si-text); }
+
+/* ── Suggested Prompts ───────────────────────────────────────────────────── */
+.si-suggested-prompts { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.si-prompt-chip {
+  padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 500;
+  border: 1px solid var(--si-border); background: var(--si-bg);
+  color: var(--si-indigo); cursor: pointer; transition: all 0.15s;
+}
+.si-prompt-chip:hover { background: var(--si-nav-active); color: #fff; border-color: var(--si-nav-active); }
+
+/* ── Scheme Recommendation Cards ────────────────────────────────────────── */
+.si-rec-container {
+  display: flex; flex-direction: column; gap: 7px;
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 10px; max-width: 90%;
+}
+.si-rec-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 6px; border-radius: 8px; transition: background 0.15s;
+}
+.si-rec-row:hover { background: var(--si-bg); }
+.si-rec-row.top { background: rgba(255,111,0,0.04); border: 1px solid rgba(255,111,0,0.2); border-radius: 10px; }
+.si-rec-medal { font-size: 1.3rem; flex-shrink: 0; }
+.si-rec-info { flex: 1; min-width: 0; }
+.si-rec-name { font-size: 0.78rem; font-weight: 700; color: var(--si-text); }
+.si-rec-meta { font-size: 0.68rem; color: var(--si-muted); margin-top: 1px; }
+.si-rec-tag { font-size: 0.65rem; color: var(--si-nav-active); font-weight: 600; margin-top: 2px; }
+.si-rec-btns { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.si-rec-why-btn, .si-rec-where-btn {
+  padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 600;
+  cursor: pointer; border: 1px solid; transition: all 0.15s; white-space: nowrap;
+}
+.si-rec-why-btn { border-color: var(--si-indigo); color: var(--si-indigo); background: transparent; }
+.si-rec-why-btn:hover { background: var(--si-indigo); color: #fff; }
+.si-rec-where-btn { border-color: var(--si-nav-active); color: var(--si-nav-active); background: transparent; }
+.si-rec-where-btn:hover { background: var(--si-nav-active); color: #fff; }
+
+/* ── Why / Gap Card ──────────────────────────────────────────────────────── */
+.si-why-card, .si-gap-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 10px; overflow: hidden; max-width: 90%; font-size: 0.78rem;
+}
+.si-why-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; cursor: pointer; font-weight: 600; color: var(--si-text);
+  background: var(--si-bg); border-bottom: 1px solid var(--si-border);
+}
+.si-why-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; }
+.si-why-row { display: flex; align-items: flex-start; gap: 6px; font-size: 0.74rem; line-height: 1.4; }
+.si-why-match { color: var(--si-success); }
+.si-why-cond { color: var(--si-nav-active); }
+.si-why-miss { color: #E11D48; }
+
+.si-gap-card { padding: 12px; }
+.si-gap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.si-gap-label { font-weight: 700; font-size: 0.78rem; color: var(--si-text); }
+.si-gap-score { font-size: 1.1rem; font-weight: 800; color: var(--si-nav-active); }
+.si-gap-bar { height: 6px; background: var(--si-border); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+.si-gap-fill { height: 100%; background: linear-gradient(90deg, var(--si-nav-active), var(--si-success)); border-radius: 4px; transition: width 0.5s ease; }
+.si-gap-rows { display: flex; flex-direction: column; gap: 4px; }
+.si-gap-row { display: flex; align-items: flex-start; gap: 5px; font-size: 0.73rem; }
+.si-gap-ok { color: var(--si-success); }
+.si-gap-no { color: #E11D48; }
+.si-gap-warn { color: #D97706; }
+.si-gap-next { margin-top: 8px; padding: 6px 8px; background: rgba(255,111,0,0.08); border-radius: 6px; font-size: 0.71rem; color: var(--si-nav-active); font-weight: 500; }
+
+/* ── EMI Card ────────────────────────────────────────────────────────────── */
+.si-emi-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 13px; max-width: 90%; font-size: 0.78rem;
+}
+.si-emi-title { font-weight: 700; color: var(--si-text); margin-bottom: 8px; font-size: 0.8rem; }
+.si-emi-rows { display: flex; flex-direction: column; gap: 5px; }
+.si-emi-row { display: flex; justify-content: space-between; align-items: center; }
+.si-emi-row span:first-child { color: var(--si-muted); }
+.si-emi-divider { height: 1px; background: var(--si-border); margin: 4px 0; }
+.si-emi-highlight { padding: 6px 0; }
+.si-emi-big { font-size: 1.2rem; font-weight: 800; color: var(--si-nav-active); }
+.si-emi-modify { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.si-emi-input {
+  flex: 1; min-width: 80px; padding: 5px 8px; border-radius: 8px;
+  border: 1px solid var(--si-border); background: var(--si-bg);
+  color: var(--si-text); font-size: 0.73rem; outline: none;
+}
+.si-emi-input:focus { border-color: var(--si-nav-active); }
+.si-emi-mod-btn {
+  padding: 5px 9px; border-radius: 8px; border: 1px solid var(--si-nav-active);
+  color: var(--si-nav-active); background: transparent; font-size: 0.71rem;
+  font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.si-emi-mod-btn:hover { background: var(--si-nav-active); color: #fff; }
+
+/* ── What-If Card ────────────────────────────────────────────────────────── */
+.si-whatif-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-whatif-title { font-weight: 700; color: var(--si-text); font-size: 0.78rem; margin-bottom: 10px; }
+.si-whatif-compare { display: flex; align-items: center; justify-content: space-around; gap: 8px; }
+.si-whatif-col { text-align: center; flex: 1; }
+.si-whatif-col-label { font-size: 0.65rem; color: var(--si-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+.si-whatif-val { font-size: 0.95rem; font-weight: 800; color: var(--si-text); }
+.si-whatif-count { font-size: 0.7rem; color: var(--si-muted); margin-top: 2px; }
+.si-whatif-arrow { font-size: 1.4rem; flex-shrink: 0; }
+.si-whatif-note { margin-top: 8px; font-size: 0.72rem; color: var(--si-muted); text-align: center; padding: 5px 8px; background: var(--si-bg); border-radius: 6px; }
+
+/* ── Document Checklist Card ─────────────────────────────────────────────── */
+.si-doc-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-doc-title { font-weight: 700; color: var(--si-text); font-size: 0.78rem; margin-bottom: 8px; }
+.si-doc-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.si-doc-item {
+  display: flex; align-items: center; gap: 6px; font-size: 0.73rem;
+  padding: 5px 8px; border-radius: 7px;
+}
+.si-doc-item.have { background: rgba(5,150,105,0.08); color: var(--si-success); }
+.si-doc-item.miss { background: rgba(225,29,72,0.06); color: #E11D48; }
+.si-doc-badge { margin-left: auto; font-size: 0.62rem; background: rgba(225,29,72,0.15); color: #E11D48; padding: 2px 6px; border-radius: 10px; font-weight: 700; }
+.si-doc-progress-label { font-size: 0.72rem; color: var(--si-muted); margin-bottom: 4px; }
+.si-doc-bar-bg { height: 6px; background: var(--si-border); border-radius: 4px; overflow: hidden; }
+.si-doc-bar-fill { height: 100%; background: linear-gradient(90deg, var(--si-nav-active), var(--si-success)); border-radius: 4px; transition: width 0.4s ease; }
+.si-doc-tip { margin-top: 8px; font-size: 0.7rem; color: var(--si-indigo); padding: 5px 7px; background: rgba(79,70,229,0.06); border-radius: 6px; }
+
+/* ── Fraud Warning Card ──────────────────────────────────────────────────── */
+.si-fraud-card {
+  background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.3);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-fraud-title { display: flex; align-items: center; gap: 6px; font-weight: 700; color: #D97706; font-size: 0.8rem; margin-bottom: 8px; }
+.si-fraud-url { font-size: 0.68rem; color: var(--si-muted); word-break: break-all; background: var(--si-bg); padding: 4px 8px; border-radius: 6px; margin-bottom: 7px; }
+.si-fraud-msg { font-size: 0.74rem; color: var(--si-text); margin-bottom: 8px; }
+.si-fraud-tips { display: flex; flex-direction: column; gap: 4px; }
+.si-fraud-tip { display: flex; align-items: flex-start; gap: 5px; font-size: 0.71rem; color: var(--si-text); }
+
+/* ── Financial Literacy Card ─────────────────────────────────────────────── */
+.si-lit-card {
+  background: rgba(79,70,229,0.05); border: 1px solid rgba(79,70,229,0.2);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-lit-title { font-weight: 700; color: var(--si-indigo); font-size: 0.78rem; margin-bottom: 6px; }
+.si-lit-body { font-size: 0.76rem; color: var(--si-text); line-height: 1.55; }
+
+/* ── Where to Apply Card ─────────────────────────────────────────────────── */
+.si-where-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-where-title { font-weight: 700; color: var(--si-text); font-size: 0.8rem; margin-bottom: 6px; }
+.si-where-agency { font-weight: 700; color: var(--si-indigo); font-size: 0.82rem; }
+.si-where-mode { font-size: 0.71rem; color: var(--si-muted); margin-bottom: 8px; }
+.si-where-rows { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.si-where-row { display: flex; align-items: flex-start; gap: 5px; font-size: 0.72rem; color: var(--si-text); }
+.si-where-portal {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; background: var(--si-nav-active); color: #fff;
+  border-radius: 8px; font-size: 0.73rem; font-weight: 600;
+  text-decoration: none; transition: background 0.15s;
+}
+.si-where-portal:hover { background: var(--si-indigo); }
+
+/* ── DPR Draft Card ──────────────────────────────────────────────────────── */
+.si-dpr-card {
+  background: var(--si-surface); border: 1px solid var(--si-border);
+  border-radius: 12px; padding: 12px; max-width: 90%;
+}
+.si-dpr-warning {
+  font-size: 0.68rem; color: #D97706; background: rgba(217,119,6,0.08);
+  padding: 4px 8px; border-radius: 6px; margin-bottom: 8px; font-weight: 600;
+}
+.si-dpr-title { font-weight: 700; color: var(--si-text); font-size: 0.78rem; margin-bottom: 8px; }
+.si-dpr-rows { display: flex; flex-direction: column; gap: 5px; }
+.si-dpr-row { display: flex; justify-content: space-between; font-size: 0.73rem; }
+.si-dpr-row span:first-child { color: var(--si-muted); }
+
+/* ── Success color variable (if not defined) ─────────────────────────────── */
+:root { --si-success: #059669; }
+
