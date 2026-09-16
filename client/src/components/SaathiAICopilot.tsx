@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import logoImg from '../assets/logo.png';
 import { useLanguage } from '../context/LanguageContext';
 import { useProfile } from '../context/ProfileContext';
 import { ChatMessage, UserProfile, SchemeMatchResult, DprRequest } from '../types';
@@ -118,8 +119,8 @@ const REQUIRED_FOR_MATCH = ['category', 'sector', 'gender', 'state', 'requiredLo
 const WELCOME_MSG: ExtendedMessage = {
   id: 'welcome',
   sender: 'assistant',
-  text: 'Namaste! 🙏 I am Saathi AI — your personalized government scheme discovery guide.\n\nTell me about your situation naturally — in English, Hindi, or Punjabi — and I will find the best schemes, check your eligibility, calculate EMI, and guide you through the full application journey.',
-  hindiText: 'नमस्ते! 🙏 मैं साथी AI हूँ। मुझे अपनी स्थिति के बारे में बताएं — हिंदी, अंग्रेज़ी या पंजाबी में — और मैं आपके लिए सर्वश्रेष्ठ सरकारी योजनाएं खोजूँगा।',
+  text: 'Namaste! 🙏 I am your SchemeMatch AI Assistant — your personalized government scheme discovery guide.\n\nTell me about your situation naturally — in English, Hindi, or Punjabi — and I will find the best schemes, check your eligibility, calculate EMI, and guide you through the full application journey.',
+  hindiText: 'नमस्ते! 🙏 मैं आपका SchemeMatch AI सहायक हूँ। मुझे अपनी स्थिति के बारे में बताएं — हिंदी, अंग्रेज़ी या पंजाबी में — और मैं आपके लिए सर्वश्रेष्ठ सरकारी योजनाएं खोजूँगा।',
   timestamp: 'Now',
   suggestedPrompts: []
 };
@@ -1077,7 +1078,7 @@ export const SaathiPanel: React.FC<{ collapsed: boolean; onToggle: () => void }>
           writingMode: 'vertical-rl', transform: 'rotate(180deg)',
           fontSize: '0.72rem', fontWeight: 700, color: 'var(--si-nav-active)',
           margin: '0 auto', letterSpacing: '0.08em', userSelect: 'none'
-        }}>Saathi AI</div>
+        }}>SchemeMatch</div>
       </div>
     );
   }
@@ -1091,21 +1092,8 @@ export const SaathiPanel: React.FC<{ collapsed: boolean; onToggle: () => void }>
       {/* ── Panel Header ── */}
       <div className="si-saathi-panel-header">
         <div className="si-saathi-panel-title">
-          <div className="si-saathi-avatar-wrap">
-            <div className="si-saathi-panel-avatar">
-              <Sparkles size={16} />
-            </div>
-            <span className="si-saathi-status-dot" title="Saathi Copilot Active" />
-          </div>
-          <div className="si-saathi-header-info">
-            <div className="si-saathi-title-row">
-              <span className="si-saathi-panel-name">Saathi AI</span>
-              <span className="si-saathi-badge">Copilot</span>
-            </div>
-            <div className="si-saathi-panel-sub">
-              <span className="si-status-text">Online</span> • 100+ Schemes
-            </div>
-          </div>
+          <img src={logoImg} alt="SchemeMatch" className="si-chat-brand-logo" />
+          <span className="si-chat-brand-name">SchemeMatch</span>
         </div>
 
         {/* Language Switcher Segmented */}
@@ -1152,13 +1140,13 @@ export const SaathiPanel: React.FC<{ collapsed: boolean; onToggle: () => void }>
             {msg.sender === 'assistant' ? (
               <div className="si-assistant-row">
                 <div className="si-msg-avatar">
-                  <Sparkles size={13} />
+                  <img src={logoImg} alt="SchemeMatch" style={{ width: '16px', height: '16px', objectFit: 'contain' }} />
                 </div>
                 <div className="si-msg-bubble-wrap">
                   {/* Chat Bubble */}
                   <div className="si-chat-bubble assistant">
                     <div className="si-chat-bubble-header">
-                      <span className="si-chat-sender">Saathi AI</span>
+                      <span className="si-chat-sender">SchemeMatch AI</span>
                       <span className="si-ai-tag">Verified</span>
                       <div className="si-bubble-actions">
                         <button
@@ -1314,10 +1302,10 @@ export const SaathiAICopilot: React.FC = () => {
 
   return (
     <>
-      <button className="saathi-floating-btn" onClick={() => setIsOpen(!isOpen)} aria-label="Open Saathi AI"
+      <button className="saathi-floating-btn" onClick={() => setIsOpen(!isOpen)} aria-label="Open SchemeMatch Assistant"
         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <Sparkles size={16} />
-        <span>Ask Saathi AI</span>
+        <img src={logoImg} alt="" style={{ width: '18px', height: '18px', objectFit: 'contain' }} />
+        <span>Ask SchemeMatch</span>
       </button>
       {isOpen && (
         <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 1000, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', borderRadius: '16px', overflow: 'hidden' }}>

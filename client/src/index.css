@@ -7769,6 +7769,36 @@ body.lang-transition-active {
   flex: 1;
 }
 
+.si-chat-brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1.5px solid var(--si-topbar-border, #FF6F00);
+  padding: 2px;
+  background: #FFFFFF;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.si-chat-brand-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .si-chat-brand-name {
+  color: #F8FAFC;
+}
+
+.si-msg-avatar img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
 .si-saathi-avatar-wrap {
   position: relative;
   flex-shrink: 0;
